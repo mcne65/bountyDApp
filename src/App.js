@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import SimpleStorageContract from '../build/contracts/SimpleStorage.json'
+import BountyContract from '../build/contracts/BountyContract.json'
 import getWeb3 from './utils/getWeb3'
 
 import './css/oswald.css'
@@ -22,17 +22,17 @@ class App extends Component {
     // See utils/getWeb3 for more info.
 
     getWeb3
-    .then(results => {
-      this.setState({
-        web3: results.web3
-      })
+      .then(results => {
+        this.setState({
+          web3: results.web3
+        })
 
-      // Instantiate contract once web3 provided.
-      this.instantiateContract()
-    })
-    .catch(() => {
-      console.log('Error finding web3.')
-    })
+        // Instantiate contract once web3 provided.
+        this.instantiateContract()
+      })
+      .catch(() => {
+        console.log('Error finding web3.')
+      })
   }
 
   instantiateContract() {
@@ -44,19 +44,19 @@ class App extends Component {
      */
 
     const contract = require('truffle-contract')
-    const simpleStorage = contract(SimpleStorageContract)
-    simpleStorage.setProvider(this.state.web3.currentProvider)
+    const bountyContract = contract(BountyContract)
+    bountyContract.setProvider(this.state.web3.currentProvider)
 
     // Declaring this for later so we can chain functions on SimpleStorage.
     var simpleStorageInstance
 
     // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
-      simpleStorage.deployed().then((instance) => {
+      bountyContract.deployed().then((instance) => {
         simpleStorageInstance = instance
 
         // Stores a given value, 5 by default.
-        return simpleStorageInstance.set(5, {from: accounts[0]})
+        return simpleStorageInstance.set(5, { from: accounts[0] })
       }).then((result) => {
         // Get the value from the contract to prove it worked.
         return simpleStorageInstance.get.call(accounts[0])
@@ -71,7 +71,7 @@ class App extends Component {
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-            <a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
+          <a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
         </nav>
 
         <main className="container">

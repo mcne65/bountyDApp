@@ -1,0 +1,26 @@
+{
+  "name": "bountyDApp",
+  "version": "1.0.0",
+  "description": "A Decentralized Application for Bounty Creator and Hunters",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s4ndhyac/bountyDApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/s4ndhyac/bountyDApp/issues"
+  },
+  "homepage": "https://github.com/s4ndhyac/bountyDApp#readme",
+  "dependencies": {
+    "openzeppelin-solidity": "1.12.0"
+  }
+}

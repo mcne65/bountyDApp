@@ -1,7 +1,7 @@
 var BountyContract = artifacts.require("./BountyContract.sol");
-var EmployeeContract = artifacts.require("./EmployeeContract.sol");
+var CircuitBreakerContract = artifacts.require("./CircuitBreakerContract.sol");
 
 module.exports = function (deployer) {
     deployer.deploy(BountyContract);
-    deployer.deploy(EmployeeContract);
+    deployer.deploy(CircuitBreakerContract);
 };

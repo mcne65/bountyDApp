@@ -48,18 +48,18 @@ class App extends Component {
     bountyContract.setProvider(this.state.web3.currentProvider)
 
     // Declaring this for later so we can chain functions on SimpleStorage.
-    var simpleStorageInstance
+    var bountyContractInstance
 
     // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
       bountyContract.deployed().then((instance) => {
-        simpleStorageInstance = instance
+        bountyContractInstance = instance
 
         // Stores a given value, 5 by default.
-        return simpleStorageInstance.set(5, { from: accounts[0] })
+        return bountyContractInstance.set(5, { from: accounts[0] })
       }).then((result) => {
         // Get the value from the contract to prove it worked.
-        return simpleStorageInstance.get.call(accounts[0])
+        return bountyContractInstance.get.call(accounts[0])
       }).then((result) => {
         // Update state with the result.
         return this.setState({ storageValue: result.c[0] })

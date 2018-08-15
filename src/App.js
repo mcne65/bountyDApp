@@ -1,18 +1,13 @@
 import React, { Component } from 'react'
 import BountyContract from '../build/contracts/BountyContract.json'
 import getWeb3 from './utils/getWeb3'
-import Create from './Create'
 
 import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
 import { Jumbotron, Container, Button, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Nav, Collapse, Row, Col } from 'reactstrap'
-import {
-  BrowserRouter,
-  Route,
-  Link
-} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 class App extends Component {
   constructor(props) {

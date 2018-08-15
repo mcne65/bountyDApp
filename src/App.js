@@ -102,7 +102,7 @@ class App extends Component {
           </Col>
           <Col lg="4">
             <h2 className="text-center">Dashboard</h2>
-            <p className="text-center" id="text-desc">Check the status of your Bounty Programs. See the solutions submitted. Accept a solution. Check which of your solutions were accepted by other Bounty Creators. Check your rewards. Pull your rewards into your wallet.</p>
+            <p className="text-center" id="text-desc">Check the status of your Bounty Programs. See the solutions submitted. Accept a solution. Check your rewards.</p>
             <p className="text-center"><Button size="lg">Dashboard</Button></p>
           </Col>
         </Row>

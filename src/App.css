@@ -22,12 +22,13 @@ code {
   padding: 45px 20px;
 }
 
-.pure-button-primary {
-  background-color: #0c1a2b;
+#pure-button-primary {
+  background-color: #fff;
+  font-size:large;
 }
 
-.pure-button-primary:hover {
-  background-color: #233e5e;
+#pure-button-primary:hover {
+  background-color: #fff;
 }
 
 .pure-form input[type="text"]:focus {
@@ -49,7 +50,7 @@ code {
   position: fixed;
   padding: 5px;
   background: #0c1a2b;
-  font-size: large
+  font-size: large;
 }
 
 .navbar a {
@@ -59,7 +60,8 @@ code {
 .navbar a:active,
 .navbar a:focus,
 .navbar a:hover {
-  background: #233e5e;
+  background: #0c1a2b;
+  color: #fff;
 }
 
 .navbar .pure-menu-heading {

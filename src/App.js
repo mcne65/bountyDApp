@@ -6,7 +6,7 @@ import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
-import {Jumbotron} from 'reactstrap'
+import { Jumbotron, Container, Button, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Nav, Collapse, Row, Col } from 'reactstrap'
 
 class App extends Component {
   constructor(props) {
@@ -62,11 +62,51 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-      <Jumbotron>
-      <h1>BountyDApp: A Decentralized Application for Bounty Creators and Hunters</h1>
-      </Jumbotron>
+        <div class="navbar-wrapper">
 
-      </div>
+          <Navbar expand="md" className="navbar-fixed-top">
+            <NavbarBrand href="/" className="mr-xl-5 h-25" id="navbar-header">BountyDApp</NavbarBrand>
+            <NavbarToggler onClick={this.toggle} />
+            <Collapse isOpen={this.state.isOpen} navbar>
+              <Nav navbar>
+                <NavItem className="mr-xl-5 h-25">
+                  <NavLink href="/create">Create</NavLink>
+                </NavItem>
+                <NavItem className="mr-xl-5 h-25">
+                  <NavLink href="/browse">Browse</NavLink>
+                </NavItem>
+                <NavItem className="mr-xl-5 h-25">
+                  <NavLink href="/browse">Dashboard</NavLink>
+                </NavItem>
+              </Nav>
+            </Collapse>
+          </Navbar>
+        </div>
+        <Jumbotron fluid>
+          <Container fluid>
+            <h1 className="display-3 text-center">Bounty DApp</h1>
+            <p className="lead text-center">A Decentralized application for Bounty Creators and Hunters</p>
+            <hr class="my-4" />
+          </Container>
+        </Jumbotron>
+        <Row>
+          <Col lg="4">
+            <h2 className="text-center">Create</h2>
+            <p className="text-center" id="text-desc">Ceate a Bounty Program. Add a description. Set the Bounty Award.</p>
+            <p className="text-center"><Button size="lg">Create</Button></p>
+          </Col>
+          <Col lg="4">
+            <h2 className="text-center">Browse</h2>
+            <p className="text-center" id="text-desc">Browse the currently running Bounty Programs. See the problem. Compare the rewards. Submit a solution.</p>
+            <p className="text-center"><Button size="lg">Browse</Button></p>
+          </Col>
+          <Col lg="4">
+            <h2 className="text-center">Dashboard</h2>
+            <p className="text-center" id="text-desc">Check the status of your Bounty Programs. See the solutions submitted. Accept a solution. Check which of your solutions were accepted by other Bounty Creators. Check your rewards. Pull your rewards into your wallet.</p>
+            <p className="text-center"><Button size="lg">Dashboard</Button></p>
+          </Col>
+        </Row>
+      </div >
     );
   }
 }

@@ -34,13 +34,22 @@ code {
   border-color: #0c1a2b;
 }
 
+#navbar-header {
+  font-size: xx-large;
+}
+
+#text-desc {
+  font-size: 15px;
+  padding: 25px 50px;
+}
+
 /* NAVBAR */
 
 .navbar {
   position: fixed;
   padding: 5px;
   background: #0c1a2b;
-  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+  font-size: large
 }
 
 .navbar a {

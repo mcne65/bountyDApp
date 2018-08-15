@@ -63,7 +63,6 @@ class App extends Component {
     return (
       <div className="App">
         <div class="navbar-wrapper">
-
           <Navbar expand="md" className="navbar-fixed-top">
             <NavbarBrand href="/" className="mr-xl-5 h-25" id="navbar-header">BountyDApp</NavbarBrand>
             <NavbarToggler onClick={this.toggle} />

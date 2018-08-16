@@ -6,7 +6,10 @@ import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
-import { Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Nav, Collapse, } from 'reactstrap'
+import {
+    Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Nav, Collapse, Card, Button, CardHeader, CardFooter, CardBody,
+    CardTitle, CardText
+} from 'reactstrap'
 import { Link } from 'react-router-dom'
 
 
@@ -59,9 +62,28 @@ class Browse extends Component {
                         </Collapse>
                     </Navbar>
                 </div>
-                <h1>Browse</h1><br /><hr />
+                <h1 className="m-md-5">Browse</h1>
+                <div>
+                    <Card>
+                        <CardHeader>Header</CardHeader>
+                        <CardBody>
+                            <CardTitle>Special Title Treatment</CardTitle>
+                            <CardText>With supporting text below as a natural lead-in to additional content.</CardText>
+                            <Button>Go somewhere</Button>
+                        </CardBody>
+                        <CardFooter>Footer</CardFooter>
+                    </Card>
 
-
+                    <Card>
+                        <CardHeader tag="h3">Featured</CardHeader>
+                        <CardBody>
+                            <CardTitle>Special Title Treatment</CardTitle>
+                            <CardText>With supporting text below as a natural lead-in to additional content.</CardText>
+                            <Button>Go somewhere</Button>
+                        </CardBody>
+                        <CardFooter className="text-muted">Footer</CardFooter>
+                    </Card>
+                </div>
             </div >
         );
     }

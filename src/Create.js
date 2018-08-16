@@ -6,7 +6,9 @@ import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
-import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap'
+import { Button, Form, FormGroup, Label, Input, FormText, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Nav, Collapse, } from 'reactstrap'
+import { Link } from 'react-router-dom'
+
 
 class Create extends Component {
     constructor(props) {
@@ -38,6 +40,26 @@ class Create extends Component {
     render() {
         return (
             <div className="Create">
+                <div class="navbar-wrapper">
+                    <Navbar expand="md" className="navbar-fixed-top">
+                        <NavbarBrand href="/" className="mr-xl-5 h-25" id="navbar-header">BountyDApp</NavbarBrand>
+                        <NavbarToggler onClick={this.toggle} />
+                        <Collapse isOpen={this.state.isOpen} navbar>
+                            <Nav navbar>
+                                <NavItem className="mr-xl-5 h-25">
+                                    <NavLink><Link to="/create">Create</Link></NavLink>
+                                </NavItem>
+                                <NavItem className="mr-xl-5 h-25">
+                                    <NavLink><Link to="/browse">Browse</Link></NavLink>
+                                </NavItem>
+                                <NavItem className="mr-xl-5 h-25">
+                                    <NavLink><Link to="/dashboard">Dashboard</Link></NavLink>
+                                </NavItem>
+                            </Nav>
+                        </Collapse>
+                    </Navbar>
+                </div>
+                <h1>Create Bounty</h1><br /><hr />
                 <Form>
                     <FormGroup>
                         <Label for="exampleEmail">Email</Label>

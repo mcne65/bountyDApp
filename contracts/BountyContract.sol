@@ -7,9 +7,8 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
 
   address private owner;
 
-  constructor(address admin) public {
+  constructor() public {
     owner = msg.sender;
-    CircuitBreakerContract(admin);
   }
 
   enum BountyStage {

@@ -6,8 +6,8 @@ contract CircuitBreakerContract is Destructible {
   bool private stopped = false;
   address private admin;
 
-  constructor(address _admin) public {
-    admin = _admin;
+  constructor() public {
+    admin = msg.sender;
   }
 
   modifier isAdmin() {

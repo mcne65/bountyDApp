@@ -1,45 +1,74 @@
 import React, { Component } from 'react'
 import getWeb3 from './utils/getWeb3'
-import Instantiate from './Instantiate'
+import BountyContract from '../build/contracts/BountyContract.json'
+import contract from 'truffle-contract'
 
 import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
-import { Button, Form, FormGroup, Label, Input, FormText, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Nav, Collapse, Col } from 'reactstrap'
+import { Button, Form, FormGroup, Label, Input, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Nav, Collapse, Col } from 'reactstrap'
 import { Link } from 'react-router-dom'
 
 
 class Create extends Component {
+
     constructor(props) {
         super(props)
-
         this.state = {
-            storageValue: 0,
-            web3: null
+            web3: null,
+            account: null
         }
+        this.bountyContract = contract(BountyContract)
+        this.createBounty = this.createBounty.bind(this)
     }
 
     componentWillMount() {
-
         getWeb3
             .then(results => {
                 this.setState({
                     web3: results.web3
                 })
-
-                Instantiate.instantiateContract()
+                this.instantiateContract()
             })
             .catch(() => {
                 console.log('Error finding web3.')
             })
     }
 
+    instantiateContract() {
+
+        this.bountyContract.setProvider(this.state.web3.currentProvider)
+        // Declaring this for later so we can chain functions on bountyContract.
+
+        // Get accounts.
+        this.state.web3.eth.getAccounts((error, accounts) => {
+            this.bountyContract.deployed().then(() => {
+                this.setState({ account: accounts[0] });
+            })
+        })
+    }
+
+    createBounty() {
+        var bountyDesc = document.getElementById("bountyProblem").value;
+        var bountyReward = document.getElementById("bountyReward").value;
+        var bountyContractInstance;
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance;
+            return bountyContractInstance.createBounty(bountyDesc, bountyReward, { from: this.state.account })
+        }).then((value) => {
+            console.log(value);
+            window.location.reload();
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
 
     render() {
         return (
             <div className="Create">
-                <div class="navbar-wrapper">
+                <div className="navbar-wrapper">
                     <Navbar expand="md" className="navbar-fixed-top">
                         <NavbarBrand href="/" className="mr-xl-5 h-25" id="navbar-header">BountyDApp</NavbarBrand>
                         <NavbarToggler onClick={this.toggle} />
@@ -76,7 +105,7 @@ class Create extends Component {
                             <Input type="reward" name="reward" id="bountyReward" placeholder="Bounty Reward" bsSize="lg" />
                         </Col>
                     </FormGroup>
-                    <p className="m-md-5"><Button size="lg">Submit</Button></p>
+                    <p className="m-md-5"><Button size="lg" onClick={() => this.createBounty()}>Submit</Button></p>
                 </Form>
             </div >
         );

@@ -13,7 +13,6 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
 
   enum BountyStage {
     Open,
-    Claimed,
     Closed
   }
 
@@ -46,8 +45,8 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
     return numBounties;
   }
   
-  function getBounty(uint bountyId) public view returns (address, bytes32, uint) {
-    return (bounties[bountyId].creator, bounties[bountyId].desc, bounties[bountyId].bountyAmt);
+  function getBounty(uint bountyId) public view returns (address, bytes32, uint, uint) {
+    return (bounties[bountyId].creator, bounties[bountyId].desc, bounties[bountyId].bountyAmt, uint(bounties[bountyId].bountyStage));
   }
 
   function returnBountiesCount() public view returns (uint) {

@@ -23,6 +23,7 @@ class Browse extends Component {
             bounties: []
         }
         this.bountyContract = contract(BountyContract)
+        this.submitSolution = this.submitSolution.bind(this)
     }
 
     componentWillMount() {
@@ -70,6 +71,20 @@ class Browse extends Component {
         })
     }
 
+    submitSolution(bountyId) {
+        var bountyContractInstance;
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance;
+            var answer = document.getElementById("solution").value;
+            this.refs.solutionRef.value = ""
+            return bountyContractInstance.createSolution(bountyId, answer, { from: this.state.account }).then((value) => {
+                console.log(value.valueOf())
+            }).catch((error) => {
+                console.log(error)
+            })
+        })
+    }
+
 
     createCard(bounty, index) {
         var bountyStage = bounty[3].valueOf() == 0 ? "Open" : bounty[3].valueOf() == 1 ? "Closed" : "Invalid State"
@@ -87,10 +102,10 @@ class Browse extends Component {
                                     <Label for="bountySolution" size="lg">Solution</Label>
                                 </Col>
                                 <Col sm={8}>
-                                    <Input type="solution" name="solution" id="solution" placeholder="Enter Solution" bsSize="lg" />
+                                    <Input type="solution" ref="solutionRef" name="solution" id="solution" placeholder="Enter Solution" bsSize="lg" />
                                 </Col>
                             </FormGroup>
-                            <Button>Submit Solution</Button>
+                            <Button onClick={() => this.submitSolution(index)}>Submit Solution</Button>
                         </div>
                     ) : null}
                 </CardBody>

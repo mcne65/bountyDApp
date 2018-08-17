@@ -101,7 +101,7 @@ class Create extends Component {
                             <Label for="bountyReward" sm={1} size="lg">Reward</Label>
                         </Col>
                         <Col sm={8}>
-                            <Input type="reward" name="reward" id="bountyReward" placeholder="Bounty Reward" bsSize="lg" />
+                            <Input type="reward" name="reward" id="bountyReward" placeholder="Enter Bounty Reward in ETH" bsSize="lg" />
                         </Col>
                     </FormGroup>
                     <p className="m-md-5"><Button size="lg" onClick={() => this.createBounty()}>Submit</Button></p>

@@ -9,7 +9,7 @@ import './css/pure-min.css'
 import './App.css'
 import {
     Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Nav, Collapse, Card, Button, CardHeader, CardFooter, CardBody,
-    CardTitle, CardText
+    CardTitle, CardText, Col, Label, Input, FormGroup
 } from 'reactstrap'
 import { Link } from 'react-router-dom'
 
@@ -78,10 +78,24 @@ class Browse extends Component {
                 <CardHeader tag="h3">{bountyStage}</CardHeader>
                 <CardBody>
                     <CardTitle>Problem Statement</CardTitle>
-                    <CardText>{this.state.web3.toAscii(bounty[1])}</CardText>
-                    <Button>Submit Solution</Button>
+                    <CardText className="lead">{this.state.web3.toAscii(bounty[1])}</CardText>
+                    <hr />
+                    {bounty[3].valueOf() == 0 ? (
+                        <div>
+                            <FormGroup row>
+                                <Col sm={1}>
+                                    <Label for="bountySolution" size="lg">Solution</Label>
+                                </Col>
+                                <Col sm={8}>
+                                    <Input type="solution" name="solution" id="solution" placeholder="Enter Solution" bsSize="lg" />
+                                </Col>
+                            </FormGroup>
+                            <Button>Submit Solution</Button>
+                        </div>
+                    ) : null}
                 </CardBody>
                 <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() + " ETH"}</CardFooter>
+                <br />
             </Card>
         )
     }

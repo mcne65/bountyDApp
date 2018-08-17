@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import getWeb3 from './utils/getWeb3'
-import Instantiate from './Instantiate'
+import BountyContract from '../build/contracts/BountyContract.json'
+import contract from 'truffle-contract'
 
 import './css/oswald.css'
 import './css/open-sans.css'
@@ -13,11 +14,11 @@ import { Link } from 'react-router-dom'
 class Dashboard extends Component {
     constructor(props) {
         super(props)
-
         this.state = {
-            storageValue: 0,
-            web3: null
+            web3: null,
+            account: null
         }
+        this.bountyContract = contract(BountyContract)
     }
 
     componentWillMount() {
@@ -28,11 +29,24 @@ class Dashboard extends Component {
                     web3: results.web3
                 })
 
-                Instantiate.instantiateContract()
+                this.instantiateContract()
             })
             .catch(() => {
                 console.log('Error finding web3.')
             })
+    }
+
+    instantiateContract() {
+
+        this.bountyContract.setProvider(this.state.web3.currentProvider)
+        // Declaring this for later so we can chain functions on bountyContract.
+
+        // Get accounts.
+        this.state.web3.eth.getAccounts((error, accounts) => {
+            this.bountyContract.deployed().then(() => {
+                this.setState({ account: accounts[0] });
+            })
+        })
     }
 
 
@@ -40,7 +54,7 @@ class Dashboard extends Component {
     render() {
         return (
             <div className="Dashboard">
-                <div class="navbar-wrapper">
+                <div className="navbar-wrapper">
                     <Navbar expand="md" className="navbar-fixed-top">
                         <NavbarBrand href="/" className="mr-xl-5 h-25" id="navbar-header">BountyDApp</NavbarBrand>
                         <NavbarToggler onClick={this.toggle} />
@@ -60,56 +74,56 @@ class Dashboard extends Component {
                     </Navbar>
                 </div>
                 <h1 className="m-md-5">Dashboard</h1>
-                <div class="container-fluid">
+                <div className="container-fluid">
                     <Row>
-                        <Col class="col-sm-3 col-md-2 sidebar">
-                            <ul class="nav nav-sidebar">
-                                <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+                        <Col className="col-sm-3 col-md-2 sidebar">
+                            <ul className="nav nav-sidebar">
+                                <li className="active"><a href="#">Overview <span className="sr-only">(current)</span></a></li>
                                 <li><a href="#">Reports</a></li>
                                 <li><a href="#">Analytics</a></li>
                                 <li><a href="#">Export</a></li>
                             </ul>
-                            <ul class="nav nav-sidebar">
+                            <ul className="nav nav-sidebar">
                                 <li><a href="">Nav item</a></li>
                                 <li><a href="">Nav item again</a></li>
                                 <li><a href="">One more nav</a></li>
                                 <li><a href="">Another nav item</a></li>
                                 <li><a href="">More navigation</a></li>
                             </ul>
-                            <ul class="nav nav-sidebar">
+                            <ul className="nav nav-sidebar">
                                 <li><a href="">Nav item again</a></li>
                                 <li><a href="">One more nav</a></li>
                                 <li><a href="">Another nav item</a></li>
                             </ul>
                         </Col>
-                        <Col class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                        <Col className="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
-                            <Row class="row placeholders">
-                                <Col class="col-xs-6 col-sm-3 placeholder">
-                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail" />
+                            <Row className="row placeholders">
+                                <Col className="col-xs-6 col-sm-3 placeholder">
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
                                     <h4>Label</h4>
-                                    <span class="text-muted">Something else</span>
+                                    <span className="text-muted">Something else</span>
                                 </Col>
-                                <Col class="col-xs-6 col-sm-3 placeholder">
-                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail" />
+                                <Col className="col-xs-6 col-sm-3 placeholder">
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
                                     <h4>Label</h4>
-                                    <span class="text-muted">Something else</span>
+                                    <span className="text-muted">Something else</span>
                                 </Col>
-                                <Col class="col-xs-6 col-sm-3 placeholder">
-                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail" />
+                                <Col className="col-xs-6 col-sm-3 placeholder">
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
                                     <h4>Label</h4>
-                                    <span class="text-muted">Something else</span>
+                                    <span className="text-muted">Something else</span>
                                 </Col>
-                                <Col class="col-xs-6 col-sm-3 placeholder">
-                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail" />
+                                <Col className="col-xs-6 col-sm-3 placeholder">
+                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" className="img-responsive" alt="Generic placeholder thumbnail" />
                                     <h4>Label</h4>
-                                    <span class="text-muted">Something else</span>
+                                    <span className="text-muted">Something else</span>
                                 </Col>
                             </Row>
 
-                            <h2 class="sub-header">Section title</h2>
-                            <div class="table-responsive">
-                                <table class="table table-striped">
+                            <h2 className="sub-header">Section title</h2>
+                            <div className="table-responsive">
+                                <table className="table table-striped">
                                     <thead>
                                         <tr>
                                             <th>#</th>

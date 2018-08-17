@@ -57,8 +57,7 @@ class Create extends Component {
             bountyContractInstance = instance;
             return bountyContractInstance.createBounty(bountyDesc, bountyReward, { from: this.state.account })
         }).then((value) => {
-            console.log(value);
-            window.location.reload();
+            console.log(value.valueOf());
         }).catch((error) => {
             console.log(error)
         })

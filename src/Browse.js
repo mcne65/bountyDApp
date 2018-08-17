@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import getWeb3 from './utils/getWeb3'
-import Instantiate from './Instantiate'
+import BountyContract from '../build/contracts/BountyContract.json'
+import contract from 'truffle-contract'
 
 import './css/oswald.css'
 import './css/open-sans.css'
@@ -16,34 +17,80 @@ import { Link } from 'react-router-dom'
 class Browse extends Component {
     constructor(props) {
         super(props)
-
         this.state = {
-            storageValue: 0,
-            web3: null
+            web3: null,
+            account: null,
+            bounties: []
         }
+        this.bountyContract = contract(BountyContract)
     }
 
     componentWillMount() {
-
         getWeb3
             .then(results => {
                 this.setState({
                     web3: results.web3
                 })
-
-                Instantiate.instantiateContract()
+                this.instantiateContract()
             })
             .catch(() => {
                 console.log('Error finding web3.')
+            }).then(() => {
+                this.getBounties()
             })
     }
 
+    instantiateContract() {
+
+        this.bountyContract.setProvider(this.state.web3.currentProvider)
+        // Declaring this for later so we can chain functions on bountyContract.
+
+        // Get accounts.
+        this.state.web3.eth.getAccounts((error, accounts) => {
+            this.bountyContract.deployed().then(() => {
+                this.setState({ account: accounts[0] });
+            })
+        })
+    }
+
+
+    getBounties() {
+        var bountyContractInstance;
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance;
+            var bountiesCreated = []
+            bountyContractInstance.returnBountiesCount().then((numBounties) => {
+                for (var i = 0; i < numBounties; i++) {
+                    bountyContractInstance.getBounty.call(i, { from: this.state.account }).then((bounty) => {
+                        bountiesCreated.push(bounty)
+                        this.setState({ bounties: bountiesCreated })
+                    })
+                }
+            })
+        })
+    }
+
+
+    createCard(bounty, index) {
+        var bountyStage = bounty[3].valueOf() == 0 ? "Open" : bounty[3].valueOf() == 1 ? "Closed" : "Invalid State"
+        return (
+            <Card key={"bountyId_" + index}>
+                <CardHeader tag="h3">{bountyStage}</CardHeader>
+                <CardBody>
+                    <CardTitle>Problem Statement</CardTitle>
+                    <CardText>{this.state.web3.toAscii(bounty[1])}</CardText>
+                    <Button>Submit Solution</Button>
+                </CardBody>
+                <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() + " ETH"}</CardFooter>
+            </Card>
+        )
+    }
 
 
     render() {
         return (
             <div className="Browse">
-                <div class="navbar-wrapper">
+                <div className="navbar-wrapper">
                     <Navbar expand="md" className="navbar-fixed-top">
                         <NavbarBrand href="/" className="mr-xl-5 h-25" id="navbar-header">BountyDApp</NavbarBrand>
                         <NavbarToggler onClick={this.toggle} />
@@ -64,25 +111,7 @@ class Browse extends Component {
                 </div>
                 <h1 className="m-md-5">Browse</h1>
                 <div>
-                    <Card>
-                        <CardHeader>Header</CardHeader>
-                        <CardBody>
-                            <CardTitle>Special Title Treatment</CardTitle>
-                            <CardText>With supporting text below as a natural lead-in to additional content.</CardText>
-                            <Button>Go somewhere</Button>
-                        </CardBody>
-                        <CardFooter>Footer</CardFooter>
-                    </Card>
-
-                    <Card>
-                        <CardHeader tag="h3">Featured</CardHeader>
-                        <CardBody>
-                            <CardTitle>Special Title Treatment</CardTitle>
-                            <CardText>With supporting text below as a natural lead-in to additional content.</CardText>
-                            <Button>Go somewhere</Button>
-                        </CardBody>
-                        <CardFooter className="text-muted">Footer</CardFooter>
-                    </Card>
+                    {this.state.bounties.map((bounty, index) => { return this.createCard(bounty, index) })}
                 </div>
             </div >
         );

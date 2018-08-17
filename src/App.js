@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import BountyContract from '../build/contracts/BountyContract.json'
 import getWeb3 from './utils/getWeb3'
+import contract from 'truffle-contract'
 
 import './css/oswald.css'
 import './css/open-sans.css'
@@ -12,11 +13,11 @@ import { Link } from 'react-router-dom'
 class App extends Component {
   constructor(props) {
     super(props)
-
     this.state = {
-      storageValue: 0,
-      web3: null
+      web3: null,
+      account: null
     }
+    this.bountyContract = contract(BountyContract)
   }
 
   componentWillMount() {
@@ -36,26 +37,13 @@ class App extends Component {
 
   instantiateContract() {
 
-    const contract = require('truffle-contract')
-    const bountyContract = contract(BountyContract)
-    bountyContract.setProvider(this.state.web3.currentProvider)
-
+    this.bountyContract.setProvider(this.state.web3.currentProvider)
     // Declaring this for later so we can chain functions on bountyContract.
-    var bountyContractInstance
 
     // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
-      bountyContract.deployed().then((instance) => {
-        bountyContractInstance = instance
-
-        // Stores a given value, 5 by default.
-        return bountyContractInstance.set(10, { from: accounts[0] })
-      }).then((result) => {
-        // Get the value from the contract to prove it worked.
-        return bountyContractInstance.get.call(accounts[0])
-      }).then((result) => {
-        // Update state with the result.
-        return this.setState({ storageValue: result.c[0] })
+      this.bountyContract.deployed().then(() => {
+        this.setState({ account: accounts[0] });
       })
     })
   }
@@ -63,7 +51,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <div class="navbar-wrapper">
+        <div className="navbar-wrapper">
           <Navbar expand="md" className="navbar-fixed-top">
             <NavbarBrand href="/" className="mr-xl-5 h-25" id="navbar-header">BountyDApp</NavbarBrand>
             <NavbarToggler onClick={this.toggle} />
@@ -86,7 +74,7 @@ class App extends Component {
           <Container fluid>
             <h1 className="display-3 text-center">Bounty DApp</h1>
             <p className="lead text-center">A Decentralized application for Bounty Creators and Hunters</p>
-            <hr class="my-4" />
+            <hr className="my-4" />
           </Container>
         </Jumbotron>
         <Row>

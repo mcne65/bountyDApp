@@ -92,7 +92,7 @@ class Browse extends Component {
             <Card key={"bountyId_" + index}>
                 <CardHeader tag="h3">{bountyStage}</CardHeader>
                 <CardBody>
-                    <CardTitle>Problem Statement</CardTitle>
+                    <CardTitle tag="h4">Problem Statement</CardTitle>
                     <CardText className="lead">{this.state.web3.toAscii(bounty[1])}</CardText>
                     <hr />
                     {bounty[3].valueOf() == 0 ? (

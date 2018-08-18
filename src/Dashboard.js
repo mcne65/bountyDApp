@@ -9,7 +9,7 @@ import './css/pure-min.css'
 import './App.css'
 import {
     Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Nav, Collapse, Card, Button, CardHeader, CardFooter, CardBody,
-    CardTitle, CardText, Col, Label, Input, FormGroup, Row
+    CardTitle, CardText, Col, Row, ListGroup, ListGroupItem, Badge
 } from 'reactstrap'
 import { Link } from 'react-router-dom'
 
@@ -20,9 +20,26 @@ class Dashboard extends Component {
         this.state = {
             web3: null,
             account: null,
-            bounties: []
+            bounties: [],
+            solutions: {},
+            flipStatus: {},
+            solutionSelected: {},
         }
         this.bountyContract = contract(BountyContract)
+        this.toggle = this.toggle.bind(this);
+    }
+
+    solutionSelectedState(bountyId, solutionId) {
+        const currentSolutionsSelected = [...this.state.solutionSelected]
+        currentSolutionsSelected[bountyId] = solutionId
+        this.setState({ solutionsSelected: currentSolutionsSelected })
+    }
+
+    toggle(index) {
+        const newflipStatus = [...this.state.flipStatus]
+        newflipStatus[index] = !this.state.flipStatus[index]
+        this.setState({ flipStatus: newflipStatus })
+        this.getSolutions(index)
     }
 
     componentWillMount() {
@@ -73,36 +90,65 @@ class Dashboard extends Component {
         })
     }
 
-    getSolutions() {
+    getSolutions(bountyId) {
+        var bountyContractInstance;
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance;
+            var solutionsSubmitted = []
+            bountyContractInstance.returnSolutionsCount(bountyId).then((numSolutions) => {
+                for (var i = 0; i < numSolutions; i++) {
+                    bountyContractInstance.getSolution.call(bountyId, i, { from: this.state.account }).then((solution) => {
+                        solutionsSubmitted.push(solution)
+                        const updatedSolutions = [...this.state.solutions]
+                        updatedSolutions[bountyId] = solutionsSubmitted
+                        this.setState({ solutions: updatedSolutions })
+                    })
+                }
+            }).catch((error) => {
+                console.log(error)
+            })
+        })
+    }
 
+    createSolutionItem(solution, index) {
 
+        var solutionState = solution[2] ? "Accepted" : ""
+        return (
+
+            <ListGroupItem key={"item_" + index} tag="button" action>{this.state.web3.toAscii(solution[1])}<Badge color="secondary">{solutionState}</Badge></ListGroupItem>
+
+        )
     }
 
     createMyBountiesCard(bounty, index) {
         var bountyStage = bounty[3].valueOf() == 0 ? "Open" : bounty[3].valueOf() == 1 ? "Closed" : "Invalid State"
+
         return (
-            <Card key={"bountyId_" + index}>
-                <CardHeader tag="h3">{bountyStage}</CardHeader>
-                <CardBody>
-                    <CardTitle>Problem Statement</CardTitle>
-                    <CardText className="lead">{this.state.web3.toAscii(bounty[1])}</CardText>
-                    {/* <hr />
-                    {bounty[3].valueOf() == 0 ? (
-                        <div>
-                            <FormGroup row>
-                                <Col sm={1}>
-                                    <Label for="bountySolution" size="lg">Solution</Label>
-                                </Col>
-                                <Col sm={8}>
-                                    <Input type="solution" ref="solutionRef" name="solution" id="solution" placeholder="Enter Solution" bsSize="lg" />
-                                </Col>
-                            </FormGroup>
-                            <Button onClick={() => this.submitSolution(index)}>Submit Solution</Button>
-                        </div>
-                    ) : null} */}
-                </CardBody>
-                <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() + " ETH"}</CardFooter>
-            </Card>
+            <div key={"div_" + index}>
+                <Card key={"bountyId_" + index}>
+                    <CardHeader tag="h3">{bountyStage}</CardHeader>
+                    <CardBody>
+                        <CardTitle tag="h4">Problem Statement</CardTitle>
+                        <CardText className="lead">{this.state.web3.toAscii(bounty[1])}</CardText>
+                        <Button onClick={() => this.toggle(index)}>View Solution</Button>
+                        <Collapse isOpen={this.state.flipStatus[index]}>
+                            <Card>
+                                <CardBody>
+                                    <ListGroup>
+                                        {
+                                            (this.state.solutions[index] != undefined) ?
+                                                this.state.solutions[index].map((solution, index) => { return this.createSolutionItem(solution, index) }) : null
+
+                                        }
+                                    </ListGroup>
+                                </CardBody>
+                            </Card>
+                        </Collapse>
+                    </CardBody>
+                    <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() + " ETH"}</CardFooter>
+                </Card>
+                <br />
+            </div>
         )
     }
 
@@ -141,10 +187,9 @@ class Dashboard extends Component {
                             </Nav>
                         </Col>
                         <Col className="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-                            <div id="myBounties">
+                            <div id="widgetview">
                                 {this.state.bounties.map((bounty, index) => { return this.createMyBountiesCard(bounty, index) })}
                             </div>
-
                         </Col>
                     </Row>
                 </div>

@@ -24,6 +24,7 @@ class Dashboard extends Component {
             solutions: {},
             flipStatus: {},
             solutionSelected: {},
+            solutionAccepted: {}
         }
         this.bountyContract = contract(BountyContract)
         this.toggle = this.toggle.bind(this);
@@ -32,7 +33,14 @@ class Dashboard extends Component {
     solutionSelectedState(bountyId, solutionId) {
         const currentSolutionsSelected = [...this.state.solutionSelected]
         currentSolutionsSelected[bountyId] = solutionId
-        this.setState({ solutionsSelected: currentSolutionsSelected })
+        this.setState({ solutionSelected: currentSolutionsSelected })
+    }
+
+    solutionAcceptedState(bountyId, solutionId) {
+        const currentSolutionsAccepted = [...this.state.solutionAccepted]
+        currentSolutionsAccepted[bountyId] = solutionId
+        this.setState({ solutionAccepted: currentSolutionsAccepted })
+        this.acceptSolution(bountyId, solutionId)
     }
 
     toggle(index) {
@@ -98,6 +106,7 @@ class Dashboard extends Component {
             bountyContractInstance.returnSolutionsCount(bountyId).then((numSolutions) => {
                 for (var i = 0; i < numSolutions; i++) {
                     bountyContractInstance.getSolution.call(bountyId, i, { from: this.state.account }).then((solution) => {
+                        console.log(solution)
                         solutionsSubmitted.push(solution)
                         const updatedSolutions = [...this.state.solutions]
                         updatedSolutions[bountyId] = solutionsSubmitted
@@ -110,15 +119,39 @@ class Dashboard extends Component {
         })
     }
 
-    createSolutionItem(solution, index) {
+    createSolutionItem(solution, solutionId, bountyId) {
 
         var solutionState = solution[2] ? "Accepted" : ""
         return (
 
-            <ListGroupItem key={"item_" + index} tag="button" action>{this.state.web3.toAscii(solution[1])}<Badge color="secondary">{solutionState}</Badge></ListGroupItem>
+            <ListGroupItem key={"item_" + bountyId + "_" + solutionId} tag="button" onClick={() => this.solutionSelectedState(bountyId, solutionId)} active={this.state.solutionSelected[bountyId] === solutionId}>{this.state.web3.toAscii(solution[1])}<Badge color="secondary">{solutionState}</Badge></ListGroupItem>
 
         )
     }
+
+    acceptSolution(bountyId, solutionId) {
+        var bountyContractInstance
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance
+            bountyContractInstance.markSolutionAccepted(bountyId, solutionId, { from: this.state.account }).then(() => {
+                console.log(bountyId + "_" + solutionId + "_" + this.state.account)
+                bountyContractInstance.awardBounty(bountyId, solutionId, { from: this.state.account }).then((value) => {
+                    console.log(value.valueOf())
+                }).catch((error) => {
+                    console.log(error)
+                })
+            })
+        })
+
+    }
+
+    acceptSolutionAction(bountyId) {
+        return (
+            <Button key={"accept_" + bountyId} onClick={() => this.solutionAcceptedState(bountyId, this.state.solutionSelected[bountyId])}>Click to Accept Selected Solution</Button>
+        )
+    }
+
+
 
     createMyBountiesCard(bounty, index) {
         var bountyStage = bounty[3].valueOf() == 0 ? "Open" : bounty[3].valueOf() == 1 ? "Closed" : "Invalid State"
@@ -137,10 +170,12 @@ class Dashboard extends Component {
                                     <ListGroup>
                                         {
                                             (this.state.solutions[index] != undefined) ?
-                                                this.state.solutions[index].map((solution, index) => { return this.createSolutionItem(solution, index) }) : null
-
+                                                this.state.solutions[index].map((solution, solutionId) => { return this.createSolutionItem(solution, solutionId, index) })
+                                                : null
                                         }
                                     </ListGroup>
+                                    <Button key={"accept_" + index} disabled={this.state.solutionAccepted[index] != undefined} onClick={() => this.solutionAcceptedState(index, this.state.solutionSelected[index])}>Click to Accept Selected Solution</Button>
+                                    {(this.state.solutionAccepted[index] == undefined) ? null : () => this.acceptSolutionAction(index)}
                                 </CardBody>
                             </Card>
                         </Collapse>

@@ -78,6 +78,10 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
     return(solutions[bountyId][solutionId].hunter, bounties[bountyId].bountyAmt);
   }
 
+  function markBountyClosed(uint bountyId) public {
+    bounties[bountyId].bountyStage = BountyStage.Closed;
+  }
+
   ///MODIFIERS///
 
   modifier onlyOwner() {

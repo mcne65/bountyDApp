@@ -12,6 +12,7 @@ import {
     CardTitle, CardText, Col, Row, ListGroup, ListGroupItem, Badge
 } from 'reactstrap'
 import { Link } from 'react-router-dom'
+import { throws } from 'assert';
 
 
 class Dashboard extends Component {
@@ -24,7 +25,8 @@ class Dashboard extends Component {
             solutions: {},
             flipStatus: {},
             solutionSelected: {},
-            solutionAccepted: {}
+            solutionAccepted: {},
+            showMyContracts: true
         }
         this.bountyContract = contract(BountyContract)
         this.toggle = this.toggle.bind(this);
@@ -47,6 +49,10 @@ class Dashboard extends Component {
         newflipStatus[index] = !this.state.flipStatus[index]
         this.setState({ flipStatus: newflipStatus })
         this.getSolutions(index)
+    }
+
+    toggleView(showMyContractsBool) {
+        this.setState({ showMyContracts: showMyContractsBool })
     }
 
     componentWillMount() {
@@ -191,6 +197,13 @@ class Dashboard extends Component {
         )
     }
 
+    showMyContractsWidgetView() {
+        if (this.state.showMyContracts)
+            return this.state.bounties.map((bounty, index) => { return this.createMyBountiesCard(bounty, index) })
+        else
+            return ""
+    }
+
 
 
     render() {
@@ -220,14 +233,13 @@ class Dashboard extends Component {
                     <Row>
                         <Col className="col-sm-2 sidebar">
                             <Nav vertical>
-                                <NavItem><NavLink id="navbar-vertical" href="#" active>My Bounties</NavLink></NavItem>
-                                <NavItem><NavLink id="navbar-vertical" href="#">My Submissions</NavLink></NavItem>
-                                <NavItem><NavLink id="navbar-vertical" href="#">My Rewards</NavLink></NavItem>
+                                <NavItem><NavLink id="navbar-vertical" href="#" onClick={() => this.toggleView(true)} active>My Bounties</NavLink></NavItem>
+                                <NavItem><NavLink id="navbar-vertical" href="#" onClick={() => this.toggleView(false)}>My Submissions</NavLink></NavItem>
                             </Nav>
                         </Col>
                         <Col className="col-sm-10">
                             <div id="widgetview">
-                                {this.state.bounties.map((bounty, index) => { return this.createMyBountiesCard(bounty, index) })}
+                                {this.showMyContractsWidgetView()}
                             </div>
                         </Col>
                     </Row>

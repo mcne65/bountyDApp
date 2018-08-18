@@ -140,6 +140,8 @@ class Dashboard extends Component {
                     var rewardInWei = reward * 1000000000000000000
                     bountyContractInstance.creditTransfer(bountyHunterAddress, reward, { from: this.state.account, value: rewardInWei }).then((value) => {
                         console.log(value.valueOf())
+                        document.getElementById("message_" + bountyId).innerHTML = "Success"
+                        this.toggle(bountyId)
                     }).catch((error) => {
                         console.log(error)
                     }).then(() => {
@@ -175,13 +177,14 @@ class Dashboard extends Component {
                                         }
                                     </ListGroup>
                                     {((typeof this.state.solutions[index] !== "undefined") && (typeof this.state.solutionAccepted[index] === "undefined")) ? (
-                                        <Button key={"accept_" + index} onClick={() => this.solutionAcceptedState(index, this.state.solutionSelected[index]).then(() => this.acceptSolution(index, this.state.solutionSelected[index]))}>Click to Accept Selected Solution</Button>
+                                        <Button key={"accept_" + index} onClick={() => this.acceptSolution(index, this.state.solutionSelected[index])}>Click to Accept Selected Solution</Button>
                                     ) : null}
                                 </CardBody>
                             </Card>
                         </Collapse>
                     </CardBody>
                     <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() + " ETH"}</CardFooter>
+                    <p key={"p_" + index} className="p" id={"message_" + index}></p>
                 </Card>
                 <br />
             </div>

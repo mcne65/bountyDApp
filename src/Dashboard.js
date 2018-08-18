@@ -134,15 +134,18 @@ class Dashboard extends Component {
         this.bountyContract.deployed().then((instance) => {
             bountyContractInstance = instance
             bountyContractInstance.markSolutionAccepted(bountyId, solutionId, { from: this.state.account }).then(() => {
-                console.log(bountyId + "_" + solutionId + "_" + this.state.account)
-                bountyContractInstance.awardBounty(bountyId, solutionId, { from: this.state.account }).then((value) => {
-                    console.log(value.valueOf())
-                }).catch((error) => {
-                    console.log(error)
+                bountyContractInstance.getSolutionToBeAwarded(bountyId, solutionId, { from: this.state.account }).then((result) => {
+                    var bountyHunterAddress = result[0]
+                    var reward = result[1].valueOf()
+                    var rewardInWei = reward * 1000000000000000000
+                    bountyContractInstance.creditTransfer(bountyHunterAddress, reward, { from: this.state.account, value: rewardInWei }).then((value) => {
+                        console.log(value.valueOf())
+                    }).catch((error) => {
+                        console.log(error)
+                    })
                 })
             })
         })
-
     }
 
     acceptSolutionAction(bountyId) {

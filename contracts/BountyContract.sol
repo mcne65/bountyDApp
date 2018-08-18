@@ -73,6 +73,11 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
     solutions[bountyId][solutionId].accepted = true;
   }
 
+  function getSolutionToBeAwarded(uint bountyId, uint solutionId) public view 
+  onlyAcceptedSolution(bountyId, solutionId) returns (address, uint) {
+    return(solutions[bountyId][solutionId].hunter, bounties[bountyId].bountyAmt);
+  }
+
   ///MODIFIERS///
 
   modifier onlyOwner() {
@@ -98,11 +103,8 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
 
 /// Bounty Payment Operations ///
 
-  function awardBounty(uint bountyId, uint solutionId) external onlyOwner stopInEmergency 
-  onlyCreator(bountyId) onlyAcceptedSolution(bountyId, solutionId) {
-    address bountyWinner = solutions[bountyId][solutionId].hunter;
-    uint32 bountyAmount = bounties[bountyId].bountyAmt;
-    asyncTransfer(bountyWinner, bountyAmount);
+  function creditTransfer(address dest, uint32 amount) public payable {
+    asyncTransfer(dest, amount);
   }
 
   function withdrawBountyWinnings(uint bountyId, uint solutionId) external onlyOwner onlyHunter(bountyId, solutionId) {

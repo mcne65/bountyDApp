@@ -79,6 +79,9 @@ class Browse extends Component {
             this.refs.solutionRef.value = ""
             return bountyContractInstance.createSolution(bountyId, answer, { from: this.state.account }).then((value) => {
                 console.log(value.valueOf())
+                var messageKey = "message_" + bountyId
+                document.getElementById(messageKey).innerHTML = "Success"
+                document.getElementById("solution").value = ""
             }).catch((error) => {
                 console.log(error)
             })
@@ -110,6 +113,7 @@ class Browse extends Component {
                     ) : null}
                 </CardBody>
                 <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() + " ETH"}</CardFooter>
+                <p key={"p_" + index} className="p" id={"message_" + index}></p>
                 <br />
             </Card>
         )

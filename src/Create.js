@@ -58,6 +58,9 @@ class Create extends Component {
             return bountyContractInstance.createBounty(bountyDesc, bountyReward, { from: this.state.account })
         }).then((value) => {
             console.log(value.valueOf());
+            document.getElementById("message").innerHTML = "Success"
+            document.getElementById("bountyProblem").value = ""
+            document.getElementById("bountyReward").value = ""
         }).catch((error) => {
             console.log(error)
         })
@@ -87,25 +90,28 @@ class Create extends Component {
                     </Navbar>
                 </div>
                 <h1 className="m-md-5">Create Bounty</h1>
-                <Form>
-                    <FormGroup row>
-                        <Col sm={1}>
-                            <Label for="bountyProblem" sm={1} size="lg">Problem Description</Label>
-                        </Col>
-                        <Col sm={8}>
-                            <Input type="textarea" name="text" id="bountyProblem" placeholder="Enter Problem Statement for Bounty Program" bsSize="lg" />
-                        </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                        <Col sm={1}>
-                            <Label for="bountyReward" sm={1} size="lg">Reward</Label>
-                        </Col>
-                        <Col sm={8}>
-                            <Input type="reward" name="reward" id="bountyReward" placeholder="Enter Bounty Reward in ETH" bsSize="lg" />
-                        </Col>
-                    </FormGroup>
-                    <p className="m-md-5"><Button size="lg" onClick={() => this.createBounty()}>Submit</Button></p>
-                </Form>
+                <div>
+                    <Form>
+                        <FormGroup row>
+                            <Col sm={1}>
+                                <Label for="bountyProblem" sm={1} size="lg">Problem Description</Label>
+                            </Col>
+                            <Col sm={8}>
+                                <Input type="textarea" name="text" id="bountyProblem" placeholder="Enter Problem Statement for Bounty Program" bsSize="lg" />
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Col sm={1}>
+                                <Label for="bountyReward" sm={1} size="lg">Reward</Label>
+                            </Col>
+                            <Col sm={8}>
+                                <Input type="reward" name="reward" id="bountyReward" placeholder="Enter Bounty Reward in ETH" bsSize="lg" />
+                            </Col>
+                        </FormGroup>
+                        <p className="m-md-5"><Button size="lg" onClick={() => this.createBounty()}>Submit</Button></p>
+                        <p className="p" id="message"></p>
+                    </Form>
+                </div>
             </div >
         );
     }

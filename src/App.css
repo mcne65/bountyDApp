@@ -16,6 +16,11 @@ code {
   background: #eee;
 }
 
+.p {
+  font-size: 15px;
+  padding: 10px
+}
+
 .container {
   box-sizing: border-box;
   width: 100%;

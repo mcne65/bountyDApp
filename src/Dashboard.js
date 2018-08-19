@@ -182,7 +182,7 @@ class Dashboard extends Component {
             var bountyContractInstance
             this.bountyContract.deployed().then((instance) => {
                 bountyContractInstance = instance
-                bountyContractInstance.withdrawBountyWinnings({ from: this.state.account, gas: 3000000 }).then((value) => {
+                bountyContractInstance.withdrawBountyReward({ from: this.state.account, gas: 3000000 }).then((value) => {
                     console.log(value)
                 }).catch((error) => {
                     console.log(error)

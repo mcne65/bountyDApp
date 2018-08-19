@@ -111,7 +111,7 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
     asyncTransfer(dest, amount);
   }
 
-  function withdrawBountyWinnings() public payable {
+  function withdrawBountyReward() public payable {
     withdrawPayments();
   }
 

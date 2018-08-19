@@ -2,14 +2,16 @@ pragma solidity ^0.4.24;
 
 import "../node_modules/openzeppelin-solidity/contracts/lifecycle/Destructible.sol";
 
+
 contract CircuitBreakerContract is Destructible {
+  
   bool private stopped = false;
   address private admin;
 
-  constructor() public {
+  constructor () public {
     admin = msg.sender;
   }
-
+  
   modifier isAdmin() {
     require(msg.sender == admin, "Sender is not Admin");
     _;
@@ -22,7 +24,11 @@ contract CircuitBreakerContract is Destructible {
   modifier stopInEmergency {if (!stopped) _;}
   modifier onlyInEmergency {if (stopped) _;}
 
-  function withdrawAll() public onlyInEmergency {
+  function isStopped() public view returns (bool) {
+    return stopped;
+  }
+
+  function withdrawAll() public onlyInEmergency isAdmin {
     destroy();
   }
 

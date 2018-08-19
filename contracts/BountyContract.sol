@@ -39,7 +39,7 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
 
   /// CRUD on Bounties ///
 
-  function createBounty(bytes32 desc, uint256 bountyAmt) public returns (uint32) {
+  function createBounty(bytes32 desc, uint256 bountyAmt) public stopInEmergency returns (uint32) {
     bounties[numBounties] = Bounty(numBounties, msg.sender, desc, bountyAmt, BountyStage.Open);
     numBounties++;
     return numBounties;
@@ -55,7 +55,7 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
 
   /// CRUD on Solutions ///
 
-  function createSolution(uint32 bountyId, bytes32 answer) public returns (uint32) {
+  function createSolution(uint32 bountyId, bytes32 answer) public stopInEmergency returns (uint32) {
     solutions[bountyId][numSolutions[bountyId]] = Solution(numSolutions[bountyId], msg.sender, answer, false);
     numSolutions[bountyId]++;
     return numSolutions[bountyId];
@@ -69,16 +69,11 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
     return numSolutions[bountyId];
   }
 
-  function markSolutionAccepted(uint32 bountyId, uint32 solutionId) public {
+  function markSolutionAccepted(uint32 bountyId, uint32 solutionId) public stopInEmergency {
     solutions[bountyId][solutionId].accepted = true;
   }
 
-  function getSolutionToBeAwarded(uint32 bountyId, uint32 solutionId) public view 
-  onlyAcceptedSolution(bountyId, solutionId) returns (address, uint256) {
-    return(solutions[bountyId][solutionId].hunter, bounties[bountyId].bountyAmt);
-  }
-
-  function markBountyClosed(uint32 bountyId) public {
+  function markBountyClosed(uint32 bountyId) public stopInEmergency {
     bounties[bountyId].bountyStage = BountyStage.Closed;
   }
 
@@ -89,17 +84,17 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
     _;
   }
 
-  modifier onlyCreator(uint32 bountyId) {
+  modifier isCreator(uint32 bountyId) {
     require(msg.sender == bounties[bountyId].creator, "Sender is not Bounty creator");
     _;
   }
 
-  modifier onlyHunter(uint32 bountyId, uint32 solutionId) {
+  modifier isHunter(uint32 bountyId, uint32 solutionId) {
     require(msg.sender == solutions[bountyId][solutionId].hunter, "Sender is not Bounty Hunter");
     _;
   }
 
-  modifier onlyAcceptedSolution(uint32 bountyId, uint32 solutionId) {
+  modifier isAcceptedSolution(uint32 bountyId, uint32 solutionId) {
     require(solutions[bountyId][solutionId].accepted == true, "Solution is not accepted");
     _;
   }
@@ -107,11 +102,11 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
 
 /// Bounty Payment Operations ///
 
-  function creditTransfer(address dest, uint256 amount) public payable {
+  function creditTransfer(address dest, uint256 amount) public payable stopInEmergency {
     asyncTransfer(dest, amount);
   }
 
-  function withdrawBountyReward() public payable {
+  function withdrawBountyReward() public {
     withdrawPayments();
   }
 
@@ -119,8 +114,10 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
     return payments(hunterAddress);
   }
 
-  function withdrawAll() public onlyInEmergency {
-    withdrawAll();
-  } 
+  /// Circuit Breaker Operations ///
+
+
+
+
   
 }

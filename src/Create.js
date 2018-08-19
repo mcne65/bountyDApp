@@ -17,7 +17,8 @@ class Create extends Component {
         super(props)
         this.state = {
             web3: null,
-            account: null
+            account: null,
+            isStopped: false
         }
         this.bountyContract = contract(BountyContract)
         this.createBounty = this.createBounty.bind(this)
@@ -33,7 +34,7 @@ class Create extends Component {
             })
             .catch(() => {
                 console.log('Error finding web3.')
-            })
+            }).then(() => this.isPaused())
     }
 
     instantiateContract() {
@@ -46,6 +47,16 @@ class Create extends Component {
             this.bountyContract.deployed().then(() => {
                 this.setState({ account: accounts[0] });
             })
+        })
+    }
+
+    isPaused() {
+        var bountyContractInstance;
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance;
+            return bountyContractInstance.isStopped({ from: this.state.account })
+        }).then((value) => {
+            this.setState({ isStopped: value })
         })
     }
 
@@ -109,7 +120,7 @@ class Create extends Component {
                                 <Input type="reward" name="reward" id="bountyReward" placeholder="Enter Bounty Reward in ETH" bsSize="lg" />
                             </Col>
                         </FormGroup>
-                        <p className="m-md-5"><Button size="lg" onClick={() => this.createBounty()}>Submit</Button></p>
+                        <p className="m-md-5"><Button size="lg" onClick={() => this.createBounty()} disabled={this.state.isStopped}>Submit</Button></p>
                         <p className="p" id="message"></p>
                     </Form>
                 </div>

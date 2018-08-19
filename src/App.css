@@ -21,6 +21,15 @@ code {
   padding: 10px
 }
 
+.psize {
+  font-size: 15px;
+}
+
+.plpadding {
+  font-size: 15px;
+  padding-left: 80px;
+}
+
 .container {
   box-sizing: border-box;
   width: 100%;

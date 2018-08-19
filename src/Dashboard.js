@@ -213,7 +213,7 @@ class Dashboard extends Component {
                 bountyContractInstance = instance
                 bountyContractInstance.checkBountyWinnings(hunterAddress, { from: this.state.account }).then((value) => {
                     console.log(value)
-                    document.getElementById("credited").innerHTML = value.valueOf() / 1000000000000000000
+                    document.getElementById("credited").innerHTML = this.state.web3.fromWei(value.valueOf(), "ether") + " ETH"
                 }).catch((error) => {
                     console.log(error)
                 })
@@ -255,7 +255,7 @@ class Dashboard extends Component {
                                 </Card>
                             </Collapse>
                         </CardBody>
-                        <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() / 1000000000000000000 + " ETH"}</CardFooter>
+                        <CardFooter tag="h3">{"Reward: " + this.state.web3.fromWei(bounty[2].valueOf(), "ether") + " ETH"}</CardFooter>
                         <p key={"p_" + index} className="p" id={"message_" + index}></p>
                     </Card>
                     <br />
@@ -282,7 +282,7 @@ class Dashboard extends Component {
                                 }
                             </ListGroup>
                         </CardBody>
-                        <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() / 1000000000000000000 + " ETH"}</CardFooter>
+                        <CardFooter tag="h3">{"Reward: " + this.state.web3.fromWei(bounty[2].valueOf(), "ether") + " ETH"}</CardFooter>
                     </Card>
                     <br />
                 </div>
@@ -290,7 +290,12 @@ class Dashboard extends Component {
         }
     }
 
-
+    getBalance() {
+        this.state.web3.eth.getBalance(this.state.account, (err, balance) => {
+            this.balance = this.state.web3.fromWei(balance, "ether") + " ETH"
+            document.getElementById("balance").innerHTML = this.balance
+        });
+    }
 
 
     showMyContractsWidgetView() {
@@ -304,7 +309,7 @@ class Dashboard extends Component {
                             <Button color="secondary" onClick={() => this.checkWinnings()}>Winnings Available</Button>
                         </Col>
                         <Col>
-                            <p id="credited"></p>
+                            <p className="psize" id="credited"></p>
                         </Col>
                     </Row><hr />
                     <Row>
@@ -312,7 +317,15 @@ class Dashboard extends Component {
                             <Button color="secondary" onClick={() => this.pullReward()}>Withdraw Winnings</Button>
                         </Col>
                         <Col>
-                            <p id="transfer"></p>
+                            <p className="psize" id="transfer"></p>
+                        </Col>
+                    </Row><hr />
+                    <Row>
+                        <Col>
+                            <Button color="secondary" onClick={() => this.getBalance()}>Get Balance</Button>
+                        </Col>
+                        <Col>
+                            <p className="psize" id="balance"></p>
                         </Col>
                     </Row><hr />
                     {this.state.allBounties.map((bounty, index) => { return this.createMySolutionsCard(bounty, index) })}

@@ -17,7 +17,8 @@ class Admin extends Component {
         this.state = {
             web3: null,
             account: null,
-            isStopped: false
+            isStopped: false,
+            isAdmin: false
         }
         this.bountyContract = contract(BountyContract)
     }
@@ -29,12 +30,12 @@ class Admin extends Component {
                 this.setState({
                     web3: results.web3
                 })
-
                 this.instantiateContract()
             })
             .catch(() => {
                 console.log('Error finding web3.')
-            }).then(() => this.isPaused())
+            }).then(() =>
+                this.isPaused())
     }
 
     instantiateContract() {
@@ -46,7 +47,7 @@ class Admin extends Component {
         this.state.web3.eth.getAccounts((error, accounts) => {
             this.bountyContract.deployed().then(() => {
                 this.setState({ account: accounts[0] })
-            })
+            }).then(() => this.isUserAdmin())
         })
     }
 
@@ -88,6 +89,16 @@ class Admin extends Component {
         })
     }
 
+    isUserAdmin() {
+        var bountyContractInstance;
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance;
+            return bountyContractInstance.isUserAdmin({ from: this.state.account })
+        }).then((value) => {
+            this.setState({ isAdmin: value })
+        })
+    }
+
     withdrawAll() {
         var bountyContractInstance;
         this.bountyContract.deployed().then((instance) => {
@@ -106,6 +117,49 @@ class Admin extends Component {
             this.balance = this.state.web3.fromWei(balance, "ether") + " ETH"
             document.getElementById("adminbalance").innerHTML = this.balance
         });
+    }
+
+    adminView() {
+        if (this.state.isAdmin) {
+            return (
+                <div className="container-fluid">
+                    <Row className="my-md-4">
+                        <Col className="col-sm-1">
+                            <Button size="lg" onClick={() => this.pause()} disabled={this.state.isStopped}>Pause</Button>
+                        </Col>
+                        <Col>
+                            <p className="psize" id="pause"></p>
+                        </Col>
+                    </Row>
+                    <Row className="my-md-4">
+                        <Col className="col-sm-1">
+                            <Button size="lg" onClick={() => this.unpause()} disabled={!this.state.isStopped}>Un-Pause</Button>
+                        </Col>
+                        <Col>
+                            <p className="psize" id="unpause"></p>
+                        </Col>
+                    </Row>
+                    <Row className="my-md-4">
+                        <Col className="col-sm-1">
+                            <Button size="lg" onClick={() => this.withdrawAll()} disabled={!this.state.isStopped}>Withdraw all</Button>
+                        </Col>
+                        <Col>
+                            <p className="psize" id="withdrawall"></p>
+                        </Col>
+                    </Row>
+                    <Row className="my-md-4">
+                        <Col className="col-sm-1">
+                            <Button size="lg" onClick={() => this.getAdminBalance()}>Get Balance</Button>
+                        </Col>
+                        <Col>
+                            <p className="plpadding" id="adminbalance"></p>
+                        </Col>
+                    </Row>
+                </div>
+            )
+        }
+        else
+            return (<h1 className="h1lpad">User is not Admin</h1>)
     }
 
     render() {
@@ -134,40 +188,7 @@ class Admin extends Component {
                     </Navbar>
                 </div>
                 <h1 className="m-md-5">Admin Dashboard</h1>
-                <div className="container-fluid">
-                    <Row className="my-md-4">
-                        <Col className="col-sm-1">
-                            <Button size="lg" onClick={() => this.pause()} disabled={this.state.isStopped}>Pause</Button>
-                        </Col>
-                        <Col>
-                            <p className="psize" id="pause"></p>
-                        </Col>
-                    </Row>
-                    <Row className="my-md-4">
-                        <Col className="col-sm-1">
-                            <Button size="lg" onClick={() => this.unpause()} disabled={!this.state.isStopped}>Un-Pause</Button>
-                        </Col>
-                        <Col>
-                            <p className="psize" id="unpause"></p>
-                        </Col>
-                    </Row>
-                    <Row className="my-md-4">
-                        <Col className="col-sm-1">
-                            <Button size="lg" onClick={() => this.withdrawAll()} disabled={!this.state.isStopped}>Withdraw all</Button>
-                        </Col>
-                        <Col>
-                            <p className="psize" id="withdrawall"></p>
-                        </Col>
-                    </Row>
-                    <Row className="my-md-4">
-                        <Col className="col-sm-1">
-                            <Button size="lg" onClick={() => this.getAdminBalance()}>Get Admin Balance</Button>
-                        </Col>
-                        <Col>
-                            <p className="plpadding" id="adminbalance"></p>
-                        </Col>
-                    </Row>
-                </div>
+                {this.adminView()}
             </div>
         );
     }

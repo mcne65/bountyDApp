@@ -113,11 +113,5 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
   function checkBountyWinnings(address hunterAddress) public view returns(uint256) {
     return payments(hunterAddress);
   }
-
-  /// Circuit Breaker Operations ///
-
-
-
-
   
 }

@@ -16,6 +16,10 @@ code {
   background: #eee;
 }
 
+.h1lpad {
+  padding-left: 30px
+}
+
 .p {
   font-size: 15px;
   padding: 10px

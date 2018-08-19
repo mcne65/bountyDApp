@@ -4,16 +4,20 @@ import "../node_modules/openzeppelin-solidity/contracts/lifecycle/Destructible.s
 
 
 contract CircuitBreakerContract is Destructible {
-  
+
   bool private stopped = false;
   address private admin;
 
   constructor () public {
     admin = msg.sender;
   }
+
+  function isUserAdmin() public view returns(bool) {
+    return msg.sender == admin;
+  }
   
   modifier isAdmin() {
-    require(msg.sender == admin, "Sender is not Admin");
+    require(isUserAdmin(), "Sender is not Admin");
     _;
   }
 

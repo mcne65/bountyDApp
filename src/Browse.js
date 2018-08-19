@@ -149,6 +149,9 @@ class Browse extends Component {
                                 <NavItem className="mr-xl-5 h-25">
                                     <NavLink><Link to="/dashboard">Dashboard</Link></NavLink>
                                 </NavItem>
+                                <NavItem className="mr-xl-5 h-25">
+                                    <NavLink><Link to="/admin">Admin</Link></NavLink>
+                                </NavItem>
                             </Nav>
                         </Collapse>
                     </Navbar>

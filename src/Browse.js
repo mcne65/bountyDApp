@@ -20,7 +20,8 @@ class Browse extends Component {
         this.state = {
             web3: null,
             account: null,
-            bounties: []
+            bounties: [],
+            isStopped: false
         }
         this.bountyContract = contract(BountyContract)
         this.submitSolution = this.submitSolution.bind(this)
@@ -38,7 +39,7 @@ class Browse extends Component {
                 console.log('Error finding web3.')
             }).then(() => {
                 this.getBounties()
-            })
+            }).then(() => this.isPaused())
     }
 
     instantiateContract() {
@@ -51,6 +52,16 @@ class Browse extends Component {
             this.bountyContract.deployed().then(() => {
                 this.setState({ account: accounts[0] });
             })
+        })
+    }
+
+    isPaused() {
+        var bountyContractInstance;
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance;
+            return bountyContractInstance.isStopped({ from: this.state.account })
+        }).then((value) => {
+            this.setState({ isStopped: value })
         })
     }
 
@@ -108,7 +119,7 @@ class Browse extends Component {
                                     <Input type="solution" ref="solutionRef" name="solution" id="solution" placeholder="Enter Solution" bsSize="lg" />
                                 </Col>
                             </FormGroup>
-                            <Button onClick={() => this.submitSolution(index)}>Submit Solution</Button>
+                            <Button onClick={() => this.submitSolution(index)} disabled={this.state.isStopped}>Submit Solution</Button>
                         </div>
                     ) : null}
                 </CardBody>

@@ -27,10 +27,21 @@ class Dashboard extends Component {
             solutionAccepted: {},
             showMyContracts: true,
             bountyHunterSolutions: {},
-            isHunter: false
+            isHunter: false,
+            isStopped: false
         }
         this.bountyContract = contract(BountyContract)
         this.toggle = this.toggle.bind(this);
+    }
+
+    isPaused() {
+        var bountyContractInstance;
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance;
+            return bountyContractInstance.isStopped({ from: this.state.account })
+        }).then((value) => {
+            this.setState({ isStopped: value })
+        })
     }
 
     solutionSelectedState(bountyId, solutionId) {
@@ -72,7 +83,7 @@ class Dashboard extends Component {
                 console.log('Error finding web3.')
             }).then(() => {
                 this.getAllBounties()
-            })
+            }).then(() => this.isPaused())
     }
 
     instantiateContract() {
@@ -238,7 +249,7 @@ class Dashboard extends Component {
                                             }
                                         </ListGroup>
                                         {((typeof this.state.solutions[index] !== "undefined") && (typeof this.state.solutionAccepted[index] === "undefined")) ? (
-                                            <Button key={"accept_" + index} onClick={() => this.acceptSolution(index, this.state.solutionSelected[index])}>Click to Accept Selected Solution</Button>
+                                            <Button key={"accept_" + index} onClick={() => this.acceptSolution(index, this.state.solutionSelected[index])} disabled={this.state.isStopped}>Click to Accept Selected Solution</Button>
                                         ) : null}
                                     </CardBody>
                                 </Card>

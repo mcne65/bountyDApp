@@ -136,6 +136,7 @@ class Dashboard extends Component {
 
 
     createSolutionItem(solution, solutionId, bountyId) {
+        console.log(solution)
         var solutionState = solution[2] ? "Accepted" : ""
         return (
             <ListGroupItem key={"item_" + bountyId + "_" + solutionId} tag="button" onClick={() => this.solutionSelectedState(bountyId, solutionId)} active={this.state.solutionSelected[bountyId] === solutionId}>{this.state.web3.toAscii(solution[1])}<Badge size="lg" color="secondary">{solutionState}</Badge></ListGroupItem>
@@ -158,9 +159,8 @@ class Dashboard extends Component {
             bountyContractInstance.markSolutionAccepted(bountyId, solutionId, { from: this.state.account }).then(() => {
                 bountyContractInstance.getSolutionToBeAwarded(bountyId, solutionId, { from: this.state.account }).then((result) => {
                     var bountyHunterAddress = result[0]
-                    var reward = result[1].valueOf()
-                    var rewardInWei = reward * 1000000000000000000
-                    bountyContractInstance.creditTransfer(bountyHunterAddress, reward, { from: this.state.account, value: rewardInWei }).then((value) => {
+                    var rewardInWei = result[1].valueOf()
+                    bountyContractInstance.creditTransfer(bountyHunterAddress, rewardInWei, { from: this.state.account, value: rewardInWei }).then((value) => {
                         console.log(value.valueOf())
                         document.getElementById("message_" + bountyId).innerHTML = "Success"
                         this.toggle(bountyId)
@@ -182,7 +182,7 @@ class Dashboard extends Component {
             var bountyContractInstance
             this.bountyContract.deployed().then((instance) => {
                 bountyContractInstance = instance
-                bountyContractInstance.withdrawBountyWinnings({ from: this.state.account }).then((value) => {
+                bountyContractInstance.withdrawBountyWinnings({ from: this.state.account, gas: 3000000 }).then((value) => {
                     console.log(value)
                 }).catch((error) => {
                     console.log(error)
@@ -202,7 +202,7 @@ class Dashboard extends Component {
                 bountyContractInstance = instance
                 bountyContractInstance.checkBountyWinnings(hunterAddress, { from: this.state.account }).then((value) => {
                     console.log(value)
-                    document.getElementById("credited").innerHTML = value.valueOf()
+                    document.getElementById("credited").innerHTML = value.valueOf() / 1000000000000000000
                 }).catch((error) => {
                     console.log(error)
                 })
@@ -244,7 +244,7 @@ class Dashboard extends Component {
                                 </Card>
                             </Collapse>
                         </CardBody>
-                        <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() + " ETH"}</CardFooter>
+                        <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() / 1000000000000000000 + " ETH"}</CardFooter>
                         <p key={"p_" + index} className="p" id={"message_" + index}></p>
                     </Card>
                     <br />
@@ -266,12 +266,12 @@ class Dashboard extends Component {
                             <ListGroup>
                                 {
                                     (typeof this.state.bountyHunterSolutions[index] !== "undefined") ?
-                                        this.state.bountyHunterSolutions[index].map((solution, solutionId) => { return this.createSolutionItem(solution, solutionId, index) })
+                                        this.state.bountyHunterSolutions[index].map((solution, solutionId) => { return this.createSolutionItemForHunter(solution, solutionId, index) })
                                         : null
                                 }
                             </ListGroup>
                         </CardBody>
-                        <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() + " ETH"}</CardFooter>
+                        <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() / 1000000000000000000 + " ETH"}</CardFooter>
                     </Card>
                     <br />
                 </div>
@@ -290,7 +290,7 @@ class Dashboard extends Component {
                 <div>
                     <Row>
                         <Col>
-                            <Button color="secondary" onClick={() => this.checkWinnings()}>Winnings Credited</Button>
+                            <Button color="secondary" onClick={() => this.checkWinnings()}>Winnings Available</Button>
                         </Col>
                         <Col>
                             <p id="credited"></p>

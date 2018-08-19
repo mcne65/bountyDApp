@@ -112,7 +112,7 @@ class Browse extends Component {
                         </div>
                     ) : null}
                 </CardBody>
-                <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() + " ETH"}</CardFooter>
+                <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() / 1000000000000000000 + " ETH"}</CardFooter>
                 <p key={"p_" + index} className="p" id={"message_" + index}></p>
                 <br />
             </Card>

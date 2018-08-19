@@ -52,10 +52,11 @@ class Create extends Component {
     createBounty() {
         var bountyDesc = document.getElementById("bountyProblem").value;
         var bountyReward = document.getElementById("bountyReward").value;
+        var bountyRewardInWei = bountyReward * 1000000000000000000
         var bountyContractInstance;
         this.bountyContract.deployed().then((instance) => {
             bountyContractInstance = instance;
-            return bountyContractInstance.createBounty(bountyDesc, bountyReward, { from: this.state.account })
+            return bountyContractInstance.createBounty(bountyDesc, bountyRewardInWei, { from: this.state.account })
         }).then((value) => {
             console.log(value.valueOf());
             document.getElementById("message").innerHTML = "Success"

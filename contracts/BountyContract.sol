@@ -111,13 +111,12 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
     asyncTransfer(dest, amount);
   }
 
-  function withdrawBountyWinnings(uint bountyId, uint solutionId) external onlyOwner onlyHunter(bountyId, solutionId) {
+  function withdrawBountyWinnings() external onlyOwner {
     withdrawPayments();
   }
 
-  function checkBountyWinnings(uint bountyId, uint solutionId) external view onlyOwner onlyHunter(bountyId, solutionId) {
-    address bountyHunter = solutions[bountyId][solutionId].hunter;
-    payments(bountyHunter);
+  function checkBountyWinnings(address hunterAddress) external view onlyOwner returns(uint) {
+    return payments(hunterAddress);
   }
 
   function withdrawAll() public onlyInEmergency {

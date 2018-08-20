@@ -175,12 +175,10 @@ class Dashboard extends Component {
                         console.log(value.valueOf())
                         document.getElementById("message_" + bountyId).innerHTML = "Success"
                         this.toggle(bountyId)
-                    }).catch((error) => {
-                        console.log(error)
                     }).then(() => {
-                        bountyContractInstance.markBountyClosed(bountyId, { from: this.state.account }).catch((error) => {
-                            console.log(error)
-                        })
+                        bountyContractInstance.markBountyClosed(bountyId, { from: this.state.account })
+                    }).then(() => {
+                        setTimeout(function () { window.location.reload() }, 9000);
                     })
                 })
             })

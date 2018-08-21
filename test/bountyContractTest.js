@@ -96,7 +96,7 @@ contract('BountyContract', function (accounts) {
     it("should withdraw the bounty hunter's winnings from escrow to his address", function () {
         var bountyContractInstance;
         var bountyHunterAddress = accounts[1];
-        var initialBalance;
+        var initialBalance = web3.eth.getBalance(bountyHunterAddress).valueOf();
         var finalBalance;
         var availableCredit;
         return BountyContract.deployed().then(function (instance) {
@@ -104,7 +104,6 @@ contract('BountyContract', function (accounts) {
             return bountyContractInstance.checkBountyWinnings(bountyHunterAddress, { from: bountyHunterAddress });
         }).then(function (credit) {
             availableCredit = credit.valueOf();
-            initialBalance = web3.eth.getBalance(bountyHunterAddress).valueOf();
             return bountyContractInstance.withdrawBountyReward({ from: bountyHunterAddress });
         }).then(function (tx) {
             var weiUsedForGas = parseInt(tx.receipt.gasUsed) * parseInt(web3.eth.gasPrice.valueOf());

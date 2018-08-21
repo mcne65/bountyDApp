@@ -108,7 +108,7 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
 
 /// Bounty Payment Operations ///
 
-  function creditTransfer(address dest, uint256 amount) public payable stopInEmergency {
+  function creditTransfer(address dest, uint256 amount) public stopInEmergency {
     asyncTransfer(dest, amount);
   }
 

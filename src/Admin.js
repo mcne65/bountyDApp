@@ -99,19 +99,6 @@ class Admin extends Component {
         })
     }
 
-    withdrawAll() {
-        var bountyContractInstance;
-        this.bountyContract.deployed().then((instance) => {
-            bountyContractInstance = instance;
-            return bountyContractInstance.withdrawAll({ from: this.state.account, gas: 3000000 }).then((value) => {
-                console.log(value.valueOf())
-                document.getElementById("withdrawall").value = "Withdrawn All"
-            }).catch((error) => {
-                console.log(error)
-            })
-        })
-    }
-
     getAdminBalance() {
         this.state.web3.eth.getBalance(this.state.account, (err, balance) => {
             this.balance = this.state.web3.fromWei(balance, "ether") + " ETH"
@@ -137,14 +124,6 @@ class Admin extends Component {
                         </Col>
                         <Col>
                             <p className="psize" id="unpause"></p>
-                        </Col>
-                    </Row>
-                    <Row className="my-md-4">
-                        <Col className="col-sm-1">
-                            <Button color="danger" size="lg" onClick={() => this.withdrawAll()} disabled={!this.state.isStopped}>Withdraw all And Destroy</Button>
-                        </Col>
-                        <Col>
-                            <p className="psize" id="withdrawall"></p>
                         </Col>
                     </Row>
                     <Row className="my-md-4">

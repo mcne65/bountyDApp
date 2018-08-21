@@ -35,11 +35,11 @@ contract('CircuitBreakerContract', function (accounts) {
             assert.equal(result, true, "Contract is not stopped");
         })
     });
-    it("should throw exception as the contract active state is not toggled by an admin", function () {
+    it("should revert as the contract active state is not toggled by an admin", function () {
         return CircuitBreakerContract.deployed().then(function (instance) {
             return instance.toggleContractActive({ from: accounts[1] });
         }).then(assert.fail).catch(function (error) {
             assert.include(error.message, "revert", error.toString())
         })
-    })
+    });
 });

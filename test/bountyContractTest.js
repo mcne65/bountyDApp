@@ -4,7 +4,7 @@ contract('BountyContract', function (accounts) {
 
     it("should create a bounty correctly", function () {
         var bountyContractInstance;
-        var bountyDesc = '0x0000000000000000000000000000000000000000000000000000000000000000';
+        var bountyDesc = 'abcd';
         var bountyAmt = web3.toWei(1, "ether");
         return BountyContract.deployed().then(function (instance) {
             bountyContractInstance = instance;
@@ -29,7 +29,7 @@ contract('BountyContract', function (accounts) {
         var bountyContractInstance;
         var bountyId = 0;
         var solutionId;
-        var solutionDesc = '0x0000000000000000000000000000000000000000000000000000000000000000';
+        var solutionDesc = 'xyz';
         return BountyContract.deployed().then(function (instance) {
             bountyContractInstance = instance;
             return bountyContractInstance.createSolution(bountyId, solutionDesc, { from: accounts[1] });
@@ -96,7 +96,7 @@ contract('BountyContract', function (accounts) {
     it("should withdraw the bounty hunter's winnings from escrow to his address", function () {
         var bountyContractInstance;
         var bountyHunterAddress = accounts[1];
-        var initialBalance = web3.eth.getBalance(bountyHunterAddress).valueOf();
+        var initialBalance;
         var finalBalance;
         var availableCredit;
         return BountyContract.deployed().then(function (instance) {
@@ -104,6 +104,7 @@ contract('BountyContract', function (accounts) {
             return bountyContractInstance.checkBountyWinnings(bountyHunterAddress, { from: bountyHunterAddress });
         }).then(function (credit) {
             availableCredit = credit.valueOf();
+            initialBalance = web3.eth.getBalance(bountyHunterAddress).valueOf();
             return bountyContractInstance.withdrawBountyReward({ from: bountyHunterAddress });
         }).then(function (tx) {
             var weiUsedForGas = parseInt(tx.receipt.gasUsed) * parseInt(web3.eth.gasPrice.valueOf());
@@ -111,5 +112,25 @@ contract('BountyContract', function (accounts) {
             assert.equal(finalBalance, parseInt(initialBalance) + parseInt(availableCredit) - weiUsedForGas, "Bounty winnings not withdrawn to bounty hunter's address");
         })
     });
-
+    it("should revert when bounty contract with reward 0 is created", function () {
+        return BountyContract.deployed().then(function (instance) {
+            return instance.createBounty("abcd", 0, { from: accounts[0] });
+        }).then(assert.fail).catch(function (error) {
+            assert.include(error.message, "revert", error.toString());
+        })
+    });
+    it("should revert when bounty reward of 0 has to be credited", function () {
+        return BountyContract.deployed().then(function (instance) {
+            return instance.creditTransfer(accounts[1], 0, { from: accounts[1], value: 0 });
+        }).then(assert.fail).catch(function (error) {
+            assert.include(error.message, "revert", error.toString());
+        })
+    });
+    it("should revert when bounty reward of 0 has to be withdrawn", function () {
+        return BountyContract.deployed().then(function (instance) {
+            return instance.withdrawBountyReward({ from: accounts[1] });
+        }).then(assert.fail).catch(function (error) {
+            assert.include(error.message, "revert", error.toString());
+        })
+    });
 });

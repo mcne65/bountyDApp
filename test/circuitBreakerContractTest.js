@@ -39,7 +39,7 @@ contract('CircuitBreakerContract', function (accounts) {
         return CircuitBreakerContract.deployed().then(function (instance) {
             return instance.toggleContractActive({ from: accounts[1] });
         }).then(assert.fail).catch(function (error) {
-            assert.include(error.message, "revert", error.toString())
+            assert.include(error.message, "revert", error.toString());
         })
     });
 });

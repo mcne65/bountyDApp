@@ -69,11 +69,12 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
     return numSolutions[bountyId];
   }
 
-  function markSolutionAccepted(uint32 bountyId, uint32 solutionId) public stopInEmergency {
+  function markSolutionAccepted(uint32 bountyId, uint32 solutionId) public stopInEmergency 
+  onlyOpenBounty(bountyId) isCreator(bountyId) solutionNotAccepted(bountyId, solutionId) {
     solutions[bountyId][solutionId].accepted = true;
   }
 
-  function markBountyClosed(uint32 bountyId) public stopInEmergency {
+  function markBountyClosed(uint32 bountyId) public stopInEmergency onlyOpenBounty(bountyId) isCreator(bountyId) {
     bounties[bountyId].bountyStage = BountyStage.Closed;
   }
 
@@ -95,20 +96,25 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
     _;
   }
 
-  modifier isHunter(uint32 bountyId, uint32 solutionId) {
-    require(msg.sender == solutions[bountyId][solutionId].hunter, "Sender is not Bounty Hunter");
+  modifier isAcceptedSolution(uint32 bountyId, uint32 solutionId) {
+    require(solutions[bountyId][solutionId].accepted == true, "Solution is not accepted");
     _;
   }
 
-  modifier isAcceptedSolution(uint32 bountyId, uint32 solutionId) {
-    require(solutions[bountyId][solutionId].accepted == true, "Solution is not accepted");
+  modifier solutionNotAccepted(uint32 bountyId, uint32 solutionId) {
+    require(solutions[bountyId][solutionId].accepted == false, "Solution is already accepted");
+    _;
+  }
+
+  modifier onlyOpenBounty(uint32 bountyId) {
+    require(bounties[bountyId].bountyStage == BountyStage.Open, "Bounty is closed");
     _;
   }
 
 
 /// Bounty Payment Operations ///
 
-  function creditTransfer(address dest, uint256 amount) public stopInEmergency {
+  function creditTransfer(address dest, uint256 amount) public payable stopInEmergency {
     asyncTransfer(dest, amount);
   }
 

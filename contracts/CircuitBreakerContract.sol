@@ -9,6 +9,9 @@ contract CircuitBreakerContract {
     admin = msg.sender;
   }
 
+  /**
+   * @dev Check if the current user is Admin
+   */
   function isUserAdmin() public view returns(bool) {
     return msg.sender == admin;
   }
@@ -18,6 +21,9 @@ contract CircuitBreakerContract {
     _;
   }
 
+  /**
+   * @dev Toggle the contract state as active or in-active
+   */
   function toggleContractActive() public isAdmin {
     stopped = !stopped;
   }
@@ -25,6 +31,9 @@ contract CircuitBreakerContract {
   modifier stopInEmergency {if (!stopped) _;}
   modifier onlyInEmergency {if (stopped) _;}
 
+  /**
+   * @dev Check if the contract state is Stopped
+   */
   function isStopped() public view returns (bool) {
     return stopped;
   }

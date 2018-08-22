@@ -1,9 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "../node_modules/openzeppelin-solidity/contracts/lifecycle/Destructible.sol";
-
-
-contract CircuitBreakerContract is Destructible {
+contract CircuitBreakerContract {
 
   bool private stopped = false;
   address private admin;
@@ -12,6 +9,9 @@ contract CircuitBreakerContract is Destructible {
     admin = msg.sender;
   }
 
+  /**
+   * @dev Check if the current user is Admin
+   */
   function isUserAdmin() public view returns(bool) {
     return msg.sender == admin;
   }
@@ -21,6 +21,9 @@ contract CircuitBreakerContract is Destructible {
     _;
   }
 
+  /**
+   * @dev Toggle the contract state as active or in-active
+   */
   function toggleContractActive() public isAdmin {
     stopped = !stopped;
   }
@@ -28,12 +31,11 @@ contract CircuitBreakerContract is Destructible {
   modifier stopInEmergency {if (!stopped) _;}
   modifier onlyInEmergency {if (stopped) _;}
 
+  /**
+   * @dev Check if the contract state is Stopped
+   */
   function isStopped() public view returns (bool) {
     return stopped;
-  }
-
-  function withdrawAll() public onlyInEmergency isAdmin {
-    destroy();
   }
 
 }

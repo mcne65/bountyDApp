@@ -150,7 +150,7 @@ class Dashboard extends Component {
         console.log(solution)
         var solutionState = solution[2] ? "Accepted" : ""
         return (
-            <ListGroupItem key={"item_" + bountyId + "_" + solutionId} tag="button" onClick={() => this.solutionSelectedState(bountyId, solutionId)} active={this.state.solutionSelected[bountyId] === solutionId}>{this.state.web3.toAscii(solution[1])}<Badge size="lg" color="secondary">{solutionState}</Badge></ListGroupItem>
+            <ListGroupItem key={"item_" + bountyId + "_" + solutionId} tag="button" onClick={() => this.solutionSelectedState(bountyId, solutionId)} active={this.state.solutionSelected[bountyId] === solutionId}>{solution[1]}<Badge size="lg" color="secondary">{solutionState}</Badge></ListGroupItem>
         )
     }
 
@@ -158,7 +158,7 @@ class Dashboard extends Component {
         var solutionState = solution[2] ? "Accepted" : "Not Accepted"
         return (
 
-            <ListGroupItem key={"item_" + bountyId + "_" + solutionId} >{this.state.web3.toAscii(solution[1])}<Badge size="lg" color="secondary">{solutionState}</Badge></ListGroupItem>
+            <ListGroupItem key={"item_" + bountyId + "_" + solutionId} >{solution[1]}<Badge size="lg" color="secondary">{solutionState}</Badge></ListGroupItem>
 
         )
     }
@@ -234,7 +234,7 @@ class Dashboard extends Component {
                         <CardHeader tag="h3">{bountyStage}</CardHeader>
                         <CardBody>
                             <CardTitle tag="h4">Problem Statement</CardTitle>
-                            <CardText className="lead">{this.state.web3.toAscii(bounty[1])}</CardText>
+                            <CardText className="lead">{bounty[1]}</CardText>
                             <Button onClick={() => this.toggle(index)}>View Solution</Button>
                             <Collapse isOpen={this.state.flipStatus[index]}>
                                 <Card>
@@ -271,7 +271,7 @@ class Dashboard extends Component {
                         <CardHeader tag="h3">{bountyStage}</CardHeader>
                         <CardBody>
                             <CardTitle tag="h4">Problem Statement</CardTitle>
-                            <CardText className="lead">{this.state.web3.toAscii(bounty[1])}</CardText>
+                            <CardText className="lead">{bounty[1]}</CardText>
                             <ListGroup>
                                 {
                                     (typeof this.state.bountyHunterSolutions[index] !== "undefined") ?

@@ -63,7 +63,7 @@ class Create extends Component {
     createBounty() {
         var bountyDesc = document.getElementById("bountyProblem").value;
         var bountyReward = document.getElementById("bountyReward").value;
-        var bountyRewardInWei = bountyReward * 1000000000000000000
+        var bountyRewardInWei = this.state.web3.toWei(bountyReward, "ether")
         var bountyContractInstance;
         this.bountyContract.deployed().then((instance) => {
             bountyContractInstance = instance;

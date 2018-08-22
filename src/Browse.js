@@ -113,7 +113,7 @@ class Browse extends Component {
                 <CardHeader tag="h3">{bountyStage}</CardHeader>
                 <CardBody>
                     <CardTitle tag="h4">Problem Statement</CardTitle>
-                    <CardText className="lead">{this.state.web3.toAscii(bounty[1])}</CardText>
+                    <CardText className="lead">{bounty[1]}</CardText>
                     <hr />
                     {bounty[3].valueOf() == 0 ? (
                         <div>
@@ -129,7 +129,7 @@ class Browse extends Component {
                         </div>
                     ) : null}
                 </CardBody>
-                <CardFooter tag="h3">{"Reward: " + bounty[2].valueOf() / 1000000000000000000 + " ETH"}</CardFooter>
+                <CardFooter tag="h3">{"Reward: " + this.state.web3.fromWei(bounty[2].valueOf(), "ether") + " ETH"}</CardFooter>
                 <p key={"p_" + index} className="p" id={"message_" + index}></p>
                 <br />
             </Card>

@@ -86,13 +86,14 @@ class Browse extends Component {
         var bountyContractInstance;
         this.bountyContract.deployed().then((instance) => {
             bountyContractInstance = instance;
-            var answer = document.getElementById("solution").value;
+            var solutionKey = "solution_" + bountyId
+            var answer = document.getElementById(solutionKey).value;
             this.refs.solutionRef.value = ""
             return bountyContractInstance.createSolution(bountyId, answer, { from: this.state.account }).then((value) => {
                 console.log(value.valueOf())
                 var messageKey = "message_" + bountyId
                 document.getElementById(messageKey).innerHTML = "Success"
-                document.getElementById("solution").value = ""
+                document.getElementById(solutionKey).value = ""
             }).catch((error) => {
                 console.log(error)
             })
@@ -116,7 +117,7 @@ class Browse extends Component {
                                     <Label for="bountySolution" size="lg">Solution</Label>
                                 </Col>
                                 <Col sm={8}>
-                                    <Input type="solution" ref="solutionRef" name="solution" id="solution" placeholder="Enter Solution" bsSize="lg" />
+                                    <Input type="solution" ref="solutionRef" name="solution" id={"solution_" + index} placeholder="Enter Solution" bsSize="lg" />
                                 </Col>
                             </FormGroup>
                             <Button onClick={() => this.submitSolution(index)} disabled={this.state.isStopped}>Submit Solution</Button>

@@ -10,7 +10,6 @@ import './App.css'
 import { Button, Form, FormGroup, Label, Input, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink, Nav, Collapse, Col } from 'reactstrap'
 import { Link } from 'react-router-dom'
 
-
 class Create extends Component {
 
     constructor(props) {
@@ -45,7 +44,13 @@ class Create extends Component {
         // Get accounts.
         this.state.web3.eth.getAccounts((error, accounts) => {
             this.bountyContract.deployed().then(() => {
-                this.setState({ account: accounts[0] });
+                var account = this.state.web3.eth.accounts[0]
+                setInterval(() => {
+                    if (this.state.web3.eth.accounts[0] !== account) {
+                        account = this.state.web3.eth.accounts[0]
+                        this.setState({ account: account })
+                    }
+                }, 100)
             })
         })
     }
@@ -63,10 +68,11 @@ class Create extends Component {
     createBounty() {
         var bountyDesc = document.getElementById("bountyProblem").value;
         var bountyReward = document.getElementById("bountyReward").value;
-        var bountyRewardInWei = bountyReward * 1000000000000000000
+        var bountyRewardInWei = this.state.web3.toWei(bountyReward, "ether")
         var bountyContractInstance;
         this.bountyContract.deployed().then((instance) => {
             bountyContractInstance = instance;
+            console.log(typeof bountyDesc)
             return bountyContractInstance.createBounty(bountyDesc, bountyRewardInWei, { from: this.state.account })
         }).then((value) => {
             console.log(value.valueOf());

@@ -50,7 +50,13 @@ class Browse extends Component {
         // Get accounts.
         this.state.web3.eth.getAccounts((error, accounts) => {
             this.bountyContract.deployed().then(() => {
-                this.setState({ account: accounts[0] });
+                var account = this.state.web3.eth.accounts[0]
+                setInterval(() => {
+                    if (this.state.web3.eth.accounts[0] !== account) {
+                        account = this.state.web3.eth.accounts[0]
+                        this.setState({ account: account })
+                    }
+                }, 100)
             })
         })
     }

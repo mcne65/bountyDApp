@@ -16,61 +16,110 @@ A Decentralized Application for Bounty Creator and Hunters
 
 ## 1. Features
 
-Ethereum smart contracts can trivially facilitate transactions of resources (or tokens) between individuals or groups, but service transactions are more complex. Requesting individuals (issuers) must first approve the work they're receiving before paying out funds, meaning bounty hunters must have trust that the issuer will pay them in the spirit of the original contract.
+The application lets any user create a bounty with a reward or submit a solution for an open bounty. It has the following features:
 
-The _StandardBounties.sol_ contract facilitates transactions on qualitative data (often representing artifacts of completion of some service), allowing bounty issuers to systematically approve the work they receive.
+- A bounty creator can create a bounty entering a bounty description and setting a bounty reward in ETH
+- Any user can browse through the existing bounties, see the bounty problem statement, compare the bounty rewards and submit a solution for an open bounty
+- Any user can use the dashboard to - 
+    - see the status of their created bounties, go through the submitted solutions and accept a solution
+    - see the status of their submitted solutions, whether accepted or not, check the bounty winnings credited to them in an escrow account and withdraw their bounty winnings into their personal account
+- The owner/administrator of the application/smart contracts can pause/un-pause the application features in case of an attack/vulnerability
+- When the application is paused the user will not be able to create any bounties, submit any solutions or accept any solutions. User will only be able to withdraw any bounty winnings into his/her account
 
 ## 2. Setup
 
+To run the application locally, follow the steps,
+
+Clone the repo
+
+``` git clone https://github.com/s4ndhyac/bountyDApp.git ```
+
+Install the packages required
+
+``` npm install  ```
+
+Start ganache-cli on port 8545
+
+``` ganache-cli ```
+
+Make sure you have Metamask installed and import the accounts provided by ganache-cli by importing with the seed phrase
+
+Compile and deploy the smart contracts
+
+``` truffle compile ```
+
+``` truffle migrate --reset ```
+
+Run the script to serve the application on port 3000
+
+``` npm run start ```
+
 ## 3. Interaction
+
+The page should be re-loaded everytime the account is changed in Metamask to ensure that the previous account is not picked for the transaction
 
 ## 4. Implementation
 
-A bounty can be used to pay amounts of ETH or a given token, based on the successful completion of the given task. The contract aims to reduce the necessary trust in the issuer by forcing them to deposit sufficient Ether (or tokens) to pay out the bounty at least once.
+- There are two possible states for a bounty -> `BountyStage.Open` and `BountyStage.Closed` 
 
-- A bounty begins by being issued, either through the `issueBounty()` function (which issues the bounty into draft stage), or `issueAndActivateBounty()`, which issues the bounty into the active stage
+- A bounty is created by calling by the `createBounty()` function (which creates the bounty in the Open state)
 
-- In the `Draft` state, all bounty details can still be mutated.
+- Once a bounty is created in the Open state, it's parameters (the problem statement or reward amount) can not be changed/mutated
 
-  In this state, the various functions which can be called are:
-    - `contribute()` [**ANYONE**]: contributes ETH (or tokens) to the bounty
-    - `activateBounty()` [**ONLY ISSUER**]: This will activate the bounty
-    - `killBounty()` [**ONLY ISSUER**]: This will kill the bounty
+- A solution can be proposed for a bounty by calling the `createSolution()` function (which creates a solution for the bounty in the `accepted` is `false` state)
 
-  As well as several functions to alter the bounty details:
-    - `changeBountyDeadline()` [**ONLY ISSUER**]
-    - `changeBountyData()` [**ONLY ISSUER**]
-    - `changeBountyFulfillmentAmount()` [**ONLY ISSUER**]
-    - `changeBountyArbiter()` [**ONLY ISSUER**]
-    - `extendDeadline()` [**ONLY ISSUER**]
-    - `transferIssuer()` [**ONLY ISSUER**]
-    - `increasePayout()` [**ONLY ISSUER**]
+  This is only possible if the bounty is still in the `Open` stage
 
-- A bounty transitions to the `Active` state when the issuer calls `activateBounty()`, or if it was initially issued and activated.
+- The Bounty creator can then accept a proposed solution calling the following function to perform the following acts
 
-  This is only possible if
-  - the bounty hasn't expired (isn't past its deadline)
-  - the bounty has sufficient funds to pay out at least once
+    - `markSolutionAccepted()` [**ONLY BOUNTY CREATOR**] 
+    - `creditTransfer()` [**ONLY BOUNTY CREATOR**]
+    - `markBountyClosed()` [**ONLY BOUNTY CREATOR**] 
 
-  Once a bounty is `Active`, bounty hunters can submit fulfillments for it, and the bounty issuer can approve fulfillments to pay out the rewards.
+- Once a Bounty Hunter's solution is accepted he can
 
-  In this state, the various functions which can be called are:
-    - `contribute()` [**ANYONE**]: contributes ETH (or tokens) to the bounty
-    - `fulfillBounty()` [**ANYONE BUT ISSUER OR ARBITER**]:
-    - `updateFulfillment()` [**ONLY FULFILLER**]
-    - `acceptFulfillment()` [**ONLY ISSUER OR ARBITER**]:
-    - `increasePayout()` [**ONLY ISSUER**]:
-    - `transferIssuer()` [**ONLY ISSUER**]
-    - `extendDeadline()` [**ONLY ISSUER**]
-    - `killBounty()` [**ONLY ISSUER**]:
+    - call the `checkBountyWinnings()` function to check his bounty winnings credited to the escrow account
 
-- A bounty transitions to the `Dead` state when the issuer calls `killBounty()`, which drains the bounty of its remaining balance.
+    - call the `withdrawBountyReward()` function to withdraw his bounty winnings into his account
 
-  In this state, the only functions which can be called are:
-  - `extendDeadline()` [**ONLY ISSUER**]
-  - `activateBounty()` [**ONLY ISSUER**]
+- The Administrator or the Owner of the contract can pause or un-pause the contract features depending on any vulnerability using the `toggleContractActive()`[**ONLY OWNER**] function inherited from _CircuitBreakerContract.sol_ contract
+
 
 ## 5. Tests
+
+To run the tests, run the following command
+
+``` truffle test ```
+
+### CircuitBreakerContract.sol
+
+#### 1. should return true that user is admin
+
+#### 2. should return false that user is not admin
+
+#### 3. should return false that contract is not stopped
+
+#### 4. should return true that the contract is stopped
+
+#### 5. should revert as the contract active state is not toggled by an admin
+
+### BountyContract.sol
+
+#### 1. should create a bounty correctly
+
+#### 2. should create a solution correctly
+
+#### 3. should mark solution accepted and bounty closed when solution accepted for an Open bounty
+
+#### 4. should credit bounty reward to bounty hunter when solution is accepted
+
+#### 5. should withdraw the bounty hunter's winnings from escrow to his address
+
+#### 6. should revert when bounty contract with reward 0 is created
+
+#### 7. should revert when bounty reward of 0 has to be credited
+
+#### 8. should revert when bounty reward of 0 has to be withdrawn
 
 ## 6. Design Pattern Desicions
 
@@ -81,6 +130,10 @@ For all the design pattern desicions, please see [design pattern desicions](./de
 For the steps taken to avoid known common attacks, please see [avoiding common attacks](./avoiding_common_attacks.md)
 
 ## 8. Library/Contracts Imported
+
+The following packages were made use of:
+
+- 
 
 ## 9. How to access
 

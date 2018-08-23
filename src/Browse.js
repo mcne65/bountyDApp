@@ -72,7 +72,7 @@ class Browse extends Component {
             bountyContractInstance = instance;
             var bountiesCreated = []
             bountyContractInstance.returnBountiesCount().then((numBounties) => {
-                for (var i = 0; i < numBounties; i++) {
+                for (var i = 0; i < numBounties.valueOf(); i++) {
                     bountyContractInstance.getBounty.call(i, { from: this.state.account }).then((bounty) => {
                         bountiesCreated.push(bounty)
                         this.setState({ bounties: bountiesCreated })

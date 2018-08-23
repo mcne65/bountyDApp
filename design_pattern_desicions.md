@@ -2,7 +2,7 @@
 
 1. [Checks-Effects-Interactions Pattern](#1-Checkers-Effects-Interactions-Pattern)
 2. [Circuit Breaker Pattern](#2-Circuit-Breaker-Pattern)
-3. [](#3-implementation)
+3. [Mapped Struct with Index](#3-mapped-struct-with-index)
 
 Design Pattern Desicions for BountyDApp
 
@@ -10,4 +10,4 @@ Design Pattern Desicions for BountyDApp
 
 ## 2. Circuit Breaker Pattern
 
-## 3. Storage pattern
+## 3. Mapped Struct with Index design pattern

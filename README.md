@@ -75,17 +75,13 @@ The page should be re-loaded everytime the account is changed in Metamask to ens
 
 - The user can browse the created bounties and corresponding solutions by calling the `getBounty()` and `getSolution()` function
 
-- The Bounty creator can then accept a proposed solution calling the following function to perform the following acts
-
-    - `markSolutionAccepted()` [**ONLY BOUNTY CREATOR**]
-    - `creditTransfer()` [**ONLY BOUNTY CREATOR**]
-    - `markBountyClosed()` [**ONLY BOUNTY CREATOR**] 
+- The Bounty creator can then accept a proposed solution calling the `untrustedAcceptSolution()` [**ONLY BOUNTY CREATOR**] function which marks the Bounty Closed and solution accepted and calls the `untrustedCreditTransfer()` [**ONLY BOUNTY CREATOR**] function 
 
 - Once a Bounty Hunter's solution is accepted he can
 
-    - call the `checkBountyWinnings()` function to check his bounty winnings credited to the escrow account
+    - call the `untrustedCheckBountyWinnings()` function to check his bounty winnings credited to the escrow account
 
-    - call the `withdrawBountyReward()` function to withdraw/pull his bounty winnings into his account
+    - call the `untrustedWithdrawBountyReward()` function to withdraw/pull his bounty winnings into his account
 
 - The Administrator or the Owner of the contract can pause or un-pause the contract features depending on any vulnerability using the `toggleContractActive()`[**ONLY OWNER**] function inherited from the _CircuitBreakerContract.sol_ contract
 
@@ -145,45 +141,38 @@ Case: Create a solution with `createSolution()`, get the solution with `getSolut
 Expected Result: Input params match output params  
 Actual Result: Input params match output params
 
-#### 3. should mark solution accepted and bounty closed when solution accepted for an Open bounty
-
-To Test: When bounty creator accepts a solution for an Open bounty, the solution should be marked accepted as true and the bounty stage should be updated to Closed  
-Case: Mark solution accepted by calling `markSolutionAccepted()`, call `getSolution()` to check state. Mark bounty as closed by calling `markBountyClosed()`, call `getBounty()` to check bounty state  
-Expected Result: solution accepted state is true and Bounty stage is Closed  
-Actual Result: solution accepted state is true and Bounty stage is Closed
-
-#### 4. should credit bounty reward to bounty hunter when solution is accepted
+#### 3. should credit bounty reward to bounty hunter when solution is accepted
 
 To Test: When solution is accepted, the bounty reward should be credited to bounty hunter, held in the escrow contract  
-Case: Call `getSolutionToBeAwarded()` to get the bounty hunter address and reward. Call `CheckBountyWinnings()` to check the initial credit to the bounty hunter. Call `creditTransfer()` to transfer the reward amount to the escrow contract. Call the `CheckBountyWinnings()` again to check the final credit to the hunter  
+Case: Call `getSolutionToBeAwarded()` to get the bounty hunter address and reward. Call `untrustedCheckBountyWinnings()` to check the initial credit to the bounty hunter. Call `untrustedAcceptSolution()` to transfer the reward amount to the escrow contract. Call the `untrustedCheckBountyWinnings()` again to check the final credit to the hunter  
 Expected Result: final credit = initial credit + bounty reward  
 Actual Result: final credit = initial credit + bounty reward 
 
-#### 5. should withdraw the bounty hunter's winnings from escrow to his address
+#### 4. should withdraw the bounty hunter's winnings from escrow to his address
 
 To Test: Bounty hunter should be able to withdraw/pull his winnings credited to the Escrow account  
-Case: Call `checkBountyWinnings()` to check the available credit to be pulled. Check his initial balance. Call `withdrawBountyReward()` to wihtdraw the credit and check his final balance  
+Case: Call `untrustedCheckBountyWinnings()` to check the available credit to be pulled. Check his initial balance. Call `untrustedWithdrawBountyReward()` to wihtdraw the credit and check his final balance  
 Expected Result: final balance = initial balance + available credit - (gas used * gas price)  
 Actual Result: final balance = initial balance + available credit - (gas used * gas price)
 
-#### 6. should revert when bounty contract with reward 0 is created
+#### 5. should revert when bounty contract with reward 0 is created
 
 To Test: Bounty creation with 0 ETH reward amount should not be possible  
 Case: Call `createBounty()` with 0 reward amount  
 Expected Result: Exception thrown with 'revert' opcode  
 Actual Result: Exception thrown with 'revert' opcode
 
-#### 7. should revert when bounty reward of 0 has to be credited
+#### 6. should revert when bounty reward of 0 has to be credited
 
 To Test: Credit transfer to escrow contract of 0 ETH should not be possible  
-Case: Call `creditTransfer()` with 0 value  
+Case: Call `untrustedCreditTransfer()` with 0 value  
 Expected Result: Exception thrown with 'revert' opcode  
 Actual Result: Exception thrown with 'revert' opcode
 
-#### 8. should revert when bounty reward of 0 has to be withdrawn
+#### 7. should revert when bounty reward of 0 has to be withdrawn
 
 To Test: Withdrawal/Pull of 0 ETH value should not be possible  
-Case: Call `withdrawBountyReward()` from an address with 0 available credit  
+Case: Call `untrustedWithdrawBountyReward()` from an address with 0 available credit  
 Expected Result: Exception thrown with 'revert' opcode  
 Actual Result: Exception thrown with 'revert' opcode
 

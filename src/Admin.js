@@ -18,7 +18,8 @@ class Admin extends Component {
             web3: null,
             account: null,
             isStopped: false,
-            isAdmin: false
+            isAdmin: false,
+            allBounties: []
         }
         this.bountyContract = contract(BountyContract)
     }
@@ -61,6 +62,8 @@ class Admin extends Component {
                 this.setState({ isStopped: true })
             }).catch((error) => {
                 console.log(error)
+            }).then(() => {
+                this.getAllBounties()
             })
         })
     }
@@ -106,6 +109,57 @@ class Admin extends Component {
         });
     }
 
+    getAllBounties() {
+        var bountyContractInstance;
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance;
+            var bountiesCreated = []
+            bountyContractInstance.returnBountiesCount().then((numBounties) => {
+                for (var i = 0; i < numBounties.valueOf(); i++) {
+                    bountyContractInstance.getBounty.call(i, { from: this.state.account }).then((bounty) => {
+                        bountiesCreated.push(bounty)
+                        this.setState({ allBounties: bountiesCreated })
+                    })
+                }
+            })
+        })
+    }
+
+    withdrawAll() {
+        var bountyContractInstance
+        var bountyHunters = []
+        this.bountyContract.deployed().then((instance) => {
+            bountyContractInstance = instance
+            bountyContractInstance.returnBountiesCount().then((numBounties) => {
+                for (let i = 0; i < numBounties.valueOf(); i++) {
+                    var bounty = this.state.allBounties[i]
+                    if (bounty[3].valueOf() == 1) {
+                        bountyContractInstance.returnSolutionsCount(i, { from: this.state.account }).then((numSolutions) => {
+                            for (let j = 0; j < numSolutions.valueOf(); j++) {
+                                bountyContractInstance.getSolution(i, j, { from: this.state.account }).then((solution) => {
+                                    if (solution[2] == true) {
+                                        if (!bountyHunters.includes(solution[0])) {
+                                            bountyHunters.push(solution[0])
+                                            bountyContractInstance.untrustedCheckBountyWinnings(solution[0], { from: this.state.account }).then((credit) => {
+                                                if (credit.valueOf() > 0) {
+                                                    bountyContractInstance.untrustedWithdrawBountyReward({ from: solution[0], gas: 3000000 }).then((result) => {
+                                                        console.log(result);
+                                                    }).catch((error) => {
+                                                        console.log(error)
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    }
+                                })
+                            }
+                        })
+                    }
+                }
+            })
+        })
+    }
+
     adminView() {
         if (this.state.isAdmin) {
             return (
@@ -124,6 +178,14 @@ class Admin extends Component {
                         </Col>
                         <Col>
                             <p className="psize" id="unpause"></p>
+                        </Col>
+                    </Row>
+                    <Row className="my-md-4">
+                        <Col className="col-sm-1">
+                            <Button size="lg" color="danger" disabled={!this.state.isStopped} onClick={() => this.withdrawAll()}>Withdraw All to Payees</Button>
+                        </Col>
+                        <Col>
+                            <p className="plpadding" id="withdrawall"></p>
                         </Col>
                     </Row>
                     <Row className="my-md-4">

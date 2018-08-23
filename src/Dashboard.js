@@ -105,7 +105,7 @@ class Dashboard extends Component {
             bountyContractInstance = instance;
             var bountiesCreated = []
             bountyContractInstance.returnBountiesCount().then((numBounties) => {
-                for (var i = 0; i < numBounties; i++) {
+                for (var i = 0; i < numBounties.valueOf(); i++) {
                     bountyContractInstance.getBounty.call(i, { from: this.state.account }).then((bounty) => {
                         bountiesCreated.push(bounty)
                         this.setState({ allBounties: bountiesCreated })
@@ -122,7 +122,7 @@ class Dashboard extends Component {
             var solutionsSubmitted = []
             var mySolutions = []
             bountyContractInstance.returnSolutionsCount(bountyId).then((numSolutions) => {
-                for (var i = 0; i < numSolutions; i++) {
+                for (var i = 0; i < numSolutions.valueOf(); i++) {
                     bountyContractInstance.getSolution.call(bountyId, i, { from: this.state.account }).then((solution) => {
                         solutionsSubmitted.push(solution)
                         const updatedSolutions = [...this.state.solutions]
@@ -167,21 +167,17 @@ class Dashboard extends Component {
         var bountyContractInstance
         this.bountyContract.deployed().then((instance) => {
             bountyContractInstance = instance
-            bountyContractInstance.markSolutionAccepted(bountyId, solutionId, { from: this.state.account }).then(() => {
-                bountyContractInstance.getSolutionToBeAwarded(bountyId, solutionId, { from: this.state.account }).then((result) => {
-                    var bountyHunterAddress = result[0]
-                    var rewardInWei = result[1].valueOf()
-                    bountyContractInstance.creditTransfer(bountyHunterAddress, rewardInWei, { from: this.state.account, value: rewardInWei }).then((value) => {
-                        console.log(value.valueOf())
-                        document.getElementById("message_" + bountyId).innerHTML = "Success"
-                        this.toggle(bountyId)
-                    }).then(() => {
-                        bountyContractInstance.markBountyClosed(bountyId, { from: this.state.account })
-                    }).then(() => {
-                        setTimeout(function () { window.location.reload() }, 9000);
-                    })
+            bountyContractInstance.getSolutionToBeAwarded(bountyId, solutionId, { from: this.state.account }).then((result) => {
+                var rewardInWei = result[1].valueOf()
+                bountyContractInstance.untrustedAcceptSolution(bountyId, solutionId, { from: this.state.account, value: rewardInWei }).then((value) => {
+                    console.log(value.valueOf())
+                    document.getElementById("message_" + bountyId).innerHTML = "Success"
+                    this.toggle(bountyId)
+                }).then(() => {
+                    setTimeout(function () { window.location.reload() }, 3000);
                 })
             })
+
         })
     }
 
@@ -191,7 +187,7 @@ class Dashboard extends Component {
             var bountyContractInstance
             this.bountyContract.deployed().then((instance) => {
                 bountyContractInstance = instance
-                bountyContractInstance.withdrawBountyReward({ from: this.state.account, gas: 3000000 }).then((value) => {
+                bountyContractInstance.untrustedWithdrawBountyReward({ from: this.state.account, gas: 3000000 }).then((value) => {
                     console.log(value)
                 }).catch((error) => {
                     console.log(error)
@@ -209,7 +205,7 @@ class Dashboard extends Component {
             var bountyContractInstance
             this.bountyContract.deployed().then((instance) => {
                 bountyContractInstance = instance
-                bountyContractInstance.checkBountyWinnings(hunterAddress, { from: this.state.account }).then((value) => {
+                bountyContractInstance.untrustedCheckBountyWinnings(hunterAddress, { from: this.state.account }).then((value) => {
                     console.log(value)
                     document.getElementById("credited").innerHTML = this.state.web3.fromWei(value.valueOf(), "ether") + " ETH"
                 }).catch((error) => {

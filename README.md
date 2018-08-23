@@ -10,67 +10,173 @@
 6. [Design Pattern Desicions](#6-design-pattern-desicions)
 7. [Avoiding Common Attacks](#7-avoiding-common-attacks)
 8. [Library/Contracts Imported](#8-library/contracts-imported)
-9. [How to access](#9-how-to-access)
+9. [Rinkeby Test Network and IPFS](#9-how-to-access)
 
 A Decentralized Application for Bounty Creator and Hunters
 
 ## 1. Features
 
-Ethereum smart contracts can trivially facilitate transactions of resources (or tokens) between individuals or groups, but service transactions are more complex. Requesting individuals (issuers) must first approve the work they're receiving before paying out funds, meaning bounty hunters must have trust that the issuer will pay them in the spirit of the original contract.
+The application lets any user create a bounty with a reward or submit a solution for an open bounty. It has the following features:
 
-The _StandardBounties.sol_ contract facilitates transactions on qualitative data (often representing artifacts of completion of some service), allowing bounty issuers to systematically approve the work they receive.
+- A bounty creator can create a bounty entering a bounty description and setting a bounty reward in ETH
+- Any user can browse through the existing bounties, see the bounty problem statement, compare the bounty rewards and submit a solution for an open bounty
+- Any user can use the dashboard to - 
+    - see the status of their created bounties, go through the submitted solutions and accept a solution
+    - see the status of their submitted solutions, whether accepted or not, check the bounty winnings credited to them in an escrow account and withdraw their bounty winnings into their personal account
+- The owner/administrator of the application/smart contracts can pause/un-pause the application features in case of an attack/vulnerability
+- When the application is paused the user will not be able to create any bounties, submit any solutions or accept any solutions. User will only be able to withdraw any bounty winnings into his/her account
 
 ## 2. Setup
 
+To run the application locally, follow the steps,
+
+Clone the repo
+
+``` git clone https://github.com/s4ndhyac/bountyDApp.git ```
+
+Install the packages required
+
+``` npm install  ```
+
+Start ganache-cli on port 8545
+
+``` ganache-cli ```
+
+Make sure you have Metamask installed and import the accounts provided by ganache-cli by importing with the seed phrase
+
+Compile and deploy the smart contracts
+
+``` truffle compile ```
+
+``` truffle migrate --reset ```
+
+Run the script to serve the application on port 3000
+
+``` npm run start ```
+
+The DApp is also deployed on the Rinkeyby Test Network, with the files being served via IPFS and can be accessed here.
+All details regarding this can be found here. 
+
 ## 3. Interaction
+
+- The page should be re-loaded everytime the account is changed in Metamask to ensure that the previous account is not picked for the transaction
+
+- The state change will reflect once the transaction complete notification is sent by Metamask
 
 ## 4. Implementation
 
-A bounty can be used to pay amounts of ETH or a given token, based on the successful completion of the given task. The contract aims to reduce the necessary trust in the issuer by forcing them to deposit sufficient Ether (or tokens) to pay out the bounty at least once.
+- There are two possible states for a bounty -> `BountyStage.Open` and `BountyStage.Closed` 
 
-- A bounty begins by being issued, either through the `issueBounty()` function (which issues the bounty into draft stage), or `issueAndActivateBounty()`, which issues the bounty into the active stage
+- A bounty is created by calling by the `createBounty()` function (which creates the bounty in the Open state)
 
-- In the `Draft` state, all bounty details can still be mutated.
+- Once a bounty is created in the Open state, it's parameters (the problem statement or reward amount) can not be changed/mutated
 
-  In this state, the various functions which can be called are:
-    - `contribute()` [**ANYONE**]: contributes ETH (or tokens) to the bounty
-    - `activateBounty()` [**ONLY ISSUER**]: This will activate the bounty
-    - `killBounty()` [**ONLY ISSUER**]: This will kill the bounty
+- A solution can be proposed for a bounty by calling the `createSolution()` function (which creates a solution for the bounty in the `accepted` is `false` state)
 
-  As well as several functions to alter the bounty details:
-    - `changeBountyDeadline()` [**ONLY ISSUER**]
-    - `changeBountyData()` [**ONLY ISSUER**]
-    - `changeBountyFulfillmentAmount()` [**ONLY ISSUER**]
-    - `changeBountyArbiter()` [**ONLY ISSUER**]
-    - `extendDeadline()` [**ONLY ISSUER**]
-    - `transferIssuer()` [**ONLY ISSUER**]
-    - `increasePayout()` [**ONLY ISSUER**]
+  This is only possible if the bounty is still in the `Open` stage
 
-- A bounty transitions to the `Active` state when the issuer calls `activateBounty()`, or if it was initially issued and activated.
+- The user can browse the created bounties and corresponding solutions by calling the `getBounty()` and `getSolution()` function
 
-  This is only possible if
-  - the bounty hasn't expired (isn't past its deadline)
-  - the bounty has sufficient funds to pay out at least once
+- The Bounty creator can then accept a proposed solution calling the `untrustedAcceptSolution()` [**ONLY BOUNTY CREATOR**] function which marks the Bounty Closed and sets the solution accepted and calls the `untrustedCreditTransfer()` [**ONLY BOUNTY CREATOR**] function to transfer the credit to the payee, held in the escrow account
 
-  Once a bounty is `Active`, bounty hunters can submit fulfillments for it, and the bounty issuer can approve fulfillments to pay out the rewards.
+- Once a Bounty Hunter's solution is accepted he can
 
-  In this state, the various functions which can be called are:
-    - `contribute()` [**ANYONE**]: contributes ETH (or tokens) to the bounty
-    - `fulfillBounty()` [**ANYONE BUT ISSUER OR ARBITER**]:
-    - `updateFulfillment()` [**ONLY FULFILLER**]
-    - `acceptFulfillment()` [**ONLY ISSUER OR ARBITER**]:
-    - `increasePayout()` [**ONLY ISSUER**]:
-    - `transferIssuer()` [**ONLY ISSUER**]
-    - `extendDeadline()` [**ONLY ISSUER**]
-    - `killBounty()` [**ONLY ISSUER**]:
+    - call the `untrustedCheckBountyWinnings()` function to check his bounty winnings credited to the escrow account
 
-- A bounty transitions to the `Dead` state when the issuer calls `killBounty()`, which drains the bounty of its remaining balance.
+    - call the `untrustedWithdrawBountyReward()` function to withdraw/pull his bounty winnings into his account
 
-  In this state, the only functions which can be called are:
-  - `extendDeadline()` [**ONLY ISSUER**]
-  - `activateBounty()` [**ONLY ISSUER**]
+- The Administrator or the Owner of the contract can pause or un-pause the contract features depending on any vulnerability using the `toggleContractActive()`[**ONLY OWNER**] function inherited from the _CircuitBreakerContract.sol_ contract
+
+- When the contract is paused `stopped` bool is `true`, the user will only be able to withdraw any bounty winnings and browse
 
 ## 5. Tests
+
+To run the tests, run the following command
+
+``` truffle test ```
+
+### CircuitBreakerContract.sol
+
+#### 1. should return true that user is admin
+
+Case: The `isUserAdmin()` function is called with the admin/owner address  
+Expected Result: true (Boolean)  
+Actual Result: true (Boolean)
+
+#### 2. should return false that user is not admin
+
+Case: The `isUserAdmin()` function is called with an address which is not the admin/owner address  
+Expected Result: false (Boolean)  
+Actual Result: false (Boolean)
+
+#### 3. should return false that contract is not stopped
+
+Case: The `isStopped()` function is called when the contract is not stopped  
+Expected Result: false (Boolean)  
+Actual Result: false (Boolean)
+
+#### 4. should return true that the contract is stopped
+
+Case: The `toggleContractActive()` function is called to stop the contract, then the `isStopped()` function is called   
+Expected Result: true (Boolean)  
+Actual Result: true (Boolean)
+
+#### 5. should throw an exception with 'revert' opcode as the contract active state is not toggled by an admin
+
+Case: The `toggleContractActive()` function is called by a user, who is not an admin/owner  
+Expected Result: An exception with the `revert` opcode should be thrown  
+Actual Result: An exception with the `revert` opcode is thrown
+
+### BountyContract.sol
+
+#### 1. should create a bounty correctly
+
+To Test: A bounty is being created properly with the proper problem description and reward amount and states  
+Case: Create a bounty with `createBounty()`, get the bounty with `getBounty()` and verify the input params match the output  
+Expected Result: Input params match output params  
+Actual Result: Input params match output params  
+
+#### 2. should create a solution correctly
+
+To Test: A solution is created properly with the appropriate solution statement  
+Case: Create a solution with `createSolution()`, get the solution with `getSolution()` and verify the input params match the output  
+Expected Result: Input params match output params  
+Actual Result: Input params match output params
+
+#### 3. should credit bounty reward to bounty hunter when solution is accepted
+
+To Test: When solution is accepted, the bounty reward should be credited to bounty hunter, held in the escrow contract  
+Case: Call `getSolutionToBeAwarded()` to get the bounty hunter address and reward. Call `untrustedCheckBountyWinnings()` to check the initial credit to the bounty hunter. Call `untrustedAcceptSolution()` to transfer the reward amount to the escrow contract. Call the `untrustedCheckBountyWinnings()` again to check the final credit to the hunter  
+Expected Result: final credit = initial credit + bounty reward  
+Actual Result: final credit = initial credit + bounty reward 
+
+#### 4. should withdraw the bounty hunter's winnings from escrow to his address
+
+To Test: Bounty hunter should be able to withdraw/pull his winnings credited to the Escrow account  
+Case: Call `untrustedCheckBountyWinnings()` to check the available credit to be pulled. Check his initial balance. Call `untrustedWithdrawBountyReward()` to withdraw the credit and check his final balance  
+Expected Result: final balance = initial balance + available credit - (gas used * gas price)  
+Actual Result: final balance = initial balance + available credit - (gas used * gas price)
+
+#### 5. should revert when bounty contract with reward 0 is created
+
+To Test: Bounty creation with 0 ETH reward amount should not be possible  
+Case: Call `createBounty()` with 0 reward amount  
+Expected Result: Exception thrown with 'revert' opcode  
+Actual Result: Exception thrown with 'revert' opcode
+
+#### 6. should revert when bounty reward of 0 has to be credited
+
+To Test: Credit transfer to escrow contract of 0 ETH should not be possible  
+Case: Call `untrustedCreditTransfer()` with 0 value  
+Expected Result: Exception thrown with 'revert' opcode  
+Actual Result: Exception thrown with 'revert' opcode
+
+#### 7. should revert when bounty reward of 0 has to be withdrawn
+
+To Test: Withdrawal/Pull of 0 ETH value should not be possible  
+Case: Call `untrustedWithdrawBountyReward()` from an address with 0 available credit  
+Expected Result: Exception thrown with 'revert' opcode  
+Actual Result: Exception thrown with 'revert' opcode
 
 ## 6. Design Pattern Desicions
 
@@ -82,7 +188,14 @@ For the steps taken to avoid known common attacks, please see [avoiding common a
 
 ## 8. Library/Contracts Imported
 
-## 9. How to access
+- The OpenZeppelin library for writing secure smart contracts was used.  
+- The _PullPayment.sol_ contract was imported into _BountyContract.sol_ 
+- _BountyContract.sol_ inherits from _PullPayment.sol_ 
+- _PullPayment.sol_ imports _Escrow.sol_ 
+- _PullPayment.sol_ exposes functions to deposit a credit into an Escrow contract and allows the payee to withdraw/pull the credit from the Escrow contract
+
+
+## 9. Rinkeby Test Network and IPFS
 
 Any application can take advantage of the bounties network registry, which is currently deployed on the Rinkeby network at `0xf209d2b723b6417cbf04c07e733bee776105a073`. The `BountiesNetwork.eth` name will also resolve to the BountyContract contract.
 

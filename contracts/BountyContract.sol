@@ -44,7 +44,7 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
    * @param desc The Bounty Problem Description
    * @param bountyAmt The Bounty Reward Amount in Wei
    */
-  function createBounty(string desc, uint256 bountyAmt) public 
+  function createBounty(string desc, uint256 bountyAmt) external 
   stopInEmergency amountIsNotZero(bountyAmt) bountiesCountDoesNotOverflow returns (uint32) {
     bounties[numBounties] = Bounty(numBounties, msg.sender, desc, bountyAmt, BountyStage.Open);
     numBounties++;
@@ -55,14 +55,14 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
    * @dev Get the Bounty by bountyId 
    * @param bountyId index of the bounty
    */
-  function getBounty(uint32 bountyId) public view validateBountiesIndex(bountyId) returns (address, string, uint256, uint32) {
+  function getBounty(uint32 bountyId) external view validateBountiesIndex(bountyId) returns (address, string, uint256, uint32) {
     return (bounties[bountyId].creator, bounties[bountyId].desc, bounties[bountyId].bountyAmt, uint32(bounties[bountyId].bountyStage));
   }
 
   /**
    * @dev Get the number of bounties created
    */
-  function returnBountiesCount() public view returns (uint32) {
+  function returnBountiesCount() external view returns (uint32) {
     return numBounties;
   }
 
@@ -73,7 +73,7 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
    * @param bountyId index of the bounty
    * @param answer the solution proposed for the bounty
    */
-  function createSolution(uint32 bountyId, string answer) public stopInEmergency solutionsCountDoesNotOverflow(bountyId) returns (uint32) {
+  function createSolution(uint32 bountyId, string answer) external stopInEmergency solutionsCountDoesNotOverflow(bountyId) returns (uint32) {
     solutions[bountyId][numSolutions[bountyId]] = Solution(numSolutions[bountyId], msg.sender, answer, false);
     numSolutions[bountyId]++;
     return numSolutions[bountyId];
@@ -84,7 +84,7 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
    * @param bountyId index of the given bounty
    * @param solutionId index of the solution
    */
-  function getSolution(uint32 bountyId, uint32 solutionId) public view 
+  function getSolution(uint32 bountyId, uint32 solutionId) external view 
   validateSolutionsIndex(bountyId, solutionId) returns (address, string, bool) {
     return (solutions[bountyId][solutionId].hunter, solutions[bountyId][solutionId].answer, solutions[bountyId][solutionId].accepted);
   }
@@ -93,40 +93,34 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
    * @dev Get the number of solutions submitted for a given bounty
    * @param bountyId index of the given bounty
    */
-  function returnSolutionsCount(uint32 bountyId) public view validateBountiesIndex(bountyId) returns (uint32) {
+  function returnSolutionsCount(uint32 bountyId) external view validateBountiesIndex(bountyId) returns (uint32) {
     return numSolutions[bountyId];
   }
 
-  /**
-   * @dev Mark a selected solution as the accepted solution for the bounty
-   * @param bountyId index of the bounty
-   * @param solutionId index of the solution
-   */
-  function markSolutionAccepted(uint32 bountyId, uint32 solutionId) public 
-  validateBountiesIndex(bountyId) validateSolutionsIndex(bountyId, solutionId) stopInEmergency 
-  onlyOpenBounty(bountyId) isCreator(bountyId) solutionNotAccepted(bountyId, solutionId) {
-    solutions[bountyId][solutionId].accepted = true;
-  }
-
-  /**
-   * @dev Mark the Bounty as closed 
-   * @param bountyId index of the bounty
-   */
-  function markBountyClosed(uint32 bountyId) public validateBountiesIndex(bountyId) stopInEmergency 
-  onlyOpenBounty(bountyId) isCreator(bountyId) {
-    bounties[bountyId].bountyStage = BountyStage.Closed;
-  }
-
+  
   /**
    * @dev Get the solution to be awarded by index
    * @param bountyId index of the bounty
    * @param solutionId index of the solution
    */
-  function getSolutionToBeAwarded(uint32 bountyId, uint32 solutionId) public view validateBountiesIndex(bountyId)
-  validateSolutionsIndex(bountyId, solutionId) isAcceptedSolution(bountyId, solutionId) returns (address, uint256) {
+  function getSolutionToBeAwarded(uint32 bountyId, uint32 solutionId) external view validateBountiesIndex(bountyId)
+  validateSolutionsIndex(bountyId, solutionId) returns (address, uint256) {
     return(solutions[bountyId][solutionId].hunter, bounties[bountyId].bountyAmt);
   }
 
+
+  /**
+   * @dev Perform all the actions to be expected when a solution is accepted
+   * @param bountyId index of the bounty
+   * @param solutionId index of the solution
+   */
+  function untrustedAcceptSolution(uint32 bountyId, uint32 solutionId) external payable
+  validateBountiesIndex(bountyId) validateSolutionsIndex(bountyId, solutionId) stopInEmergency 
+  onlyOpenBounty(bountyId) isCreator(bountyId) solutionNotAccepted(bountyId, solutionId) {
+    bounties[bountyId].bountyStage = BountyStage.Closed;
+    solutions[bountyId][solutionId].accepted = true;
+    untrustedCreditTransfer(solutions[bountyId][solutionId].hunter, bounties[bountyId].bountyAmt);
+  }
 
   ///MODIFIERS///
 
@@ -137,11 +131,6 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
 
   modifier isCreator(uint32 bountyId) {
     require(msg.sender == bounties[bountyId].creator, "Sender is not Bounty creator");
-    _;
-  }
-
-  modifier isAcceptedSolution(uint32 bountyId, uint32 solutionId) {
-    require(solutions[bountyId][solutionId].accepted == true, "Solution is not accepted");
     _;
   }
 
@@ -181,7 +170,7 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
   }
 
   modifier withdrawAmtIsNotZero (address bountyHunterAddress) {
-    require(checkBountyWinnings(bountyHunterAddress)!=0, "Nothing to withdraw");
+    require(untrustedCheckBountyWinnings(bountyHunterAddress)!=0, "Nothing to withdraw");
     _;
   }
 
@@ -193,14 +182,14 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
    * @param dest address of the bounty hunter to be credited
    * @param amount amount of Wei to be credited to the bounty hunter
    */
-  function creditTransfer(address dest, uint256 amount) public payable stopInEmergency amountIsNotZero(amount) {
+  function untrustedCreditTransfer(address dest, uint256 amount) public payable stopInEmergency amountIsNotZero(amount) {
     asyncTransfer(dest, amount);
   }
 
   /**
    * @dev Withdraw the bounty reward winnings credited from the escrow account
    */
-  function withdrawBountyReward() public withdrawAmtIsNotZero(msg.sender) {
+  function untrustedWithdrawBountyReward() external withdrawAmtIsNotZero(msg.sender) {
     withdrawPayments();
   }
 
@@ -208,8 +197,8 @@ contract BountyContract is PullPayment, CircuitBreakerContract {
    * @dev Check the bounty winnings credited in the escrow 
    * @param hunterAddress Address of the bounty hunter
    */
-  function checkBountyWinnings(address hunterAddress) public view returns(uint256) {
+  function untrustedCheckBountyWinnings(address hunterAddress) public view returns(uint256) {
     return payments(hunterAddress);
   }
-  
+
 }

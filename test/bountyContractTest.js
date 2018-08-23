@@ -48,26 +48,6 @@ contract('BountyContract', function (accounts) {
             assert.equal(solutionAcceptedState, false, "solution for bounty not created correctly, solution state wrong");
         })
     });
-
-    it("should mark solution accepted and bounty closed when solution accepted for an Open bounty", function () {
-        var bountyContractInstance;
-        var bountyId = 0;
-        var solutionId = 0;
-        return BountyContract.deployed().then(function (instance) {
-            bountyContractInstance = instance;
-            return bountyContractInstance.markSolutionAccepted(bountyId, solutionId, { from: accounts[0] });
-        }).then(function () {
-            return bountyContractInstance.getSolution(bountyId, solutionId, { from: accounts[0] });
-        }).then(function (solution) {
-            assert.equal(solution[2].valueOf(), true, "Solution is still not accepted");
-        }).then(function () {
-            return bountyContractInstance.markBountyClosed(bountyId, { from: accounts[0] });
-        }).then(function () {
-            return bountyContractInstance.getBounty(bountyId, { from: accounts[0] });
-        }).then(function (bounty) {
-            assert.equal(bounty[3].valueOf(), 1, "Bounty is still open");
-        })
-    });
     it("should credit bounty reward to bounty hunter when solution is accepted", function () {
         var bountyContractInstance;
         var bountyId = 0;
@@ -82,12 +62,12 @@ contract('BountyContract', function (accounts) {
         }).then(function (solution) {
             bountyHunter = solution[0];
             bountyReward = solution[1].valueOf();
-            return bountyContractInstance.checkBountyWinnings(bountyHunter, { from: accounts[0] });
+            return bountyContractInstance.untrustedCheckBountyWinnings(bountyHunter, { from: accounts[0] });
         }).then(function (initialBalance) {
             initialCredit = initialBalance.valueOf();
-            return bountyContractInstance.creditTransfer(bountyHunter, bountyReward, { from: accounts[0], value: bountyReward });
+            return bountyContractInstance.untrustedAcceptSolution(bountyId, solutionId, { from: accounts[0], value: bountyReward });
         }).then(function () {
-            return bountyContractInstance.checkBountyWinnings(bountyHunter, { from: accounts[0] });
+            return bountyContractInstance.untrustedCheckBountyWinnings(bountyHunter, { from: accounts[0] });
         }).then(function (finalBalance) {
             finalCredit = finalBalance.valueOf();
             assert.equal(finalCredit, parseInt(initialCredit) + parseInt(bountyReward), "correct amount not credited to bounty hunter");
@@ -101,11 +81,11 @@ contract('BountyContract', function (accounts) {
         var availableCredit;
         return BountyContract.deployed().then(function (instance) {
             bountyContractInstance = instance;
-            return bountyContractInstance.checkBountyWinnings(bountyHunterAddress, { from: bountyHunterAddress });
+            return bountyContractInstance.untrustedCheckBountyWinnings(bountyHunterAddress, { from: bountyHunterAddress });
         }).then(function (credit) {
             availableCredit = credit.valueOf();
             initialBalance = web3.eth.getBalance(bountyHunterAddress).valueOf();
-            return bountyContractInstance.withdrawBountyReward({ from: bountyHunterAddress });
+            return bountyContractInstance.untrustedWithdrawBountyReward({ from: bountyHunterAddress });
         }).then(function (tx) {
             var weiUsedForGas = parseInt(tx.receipt.gasUsed) * parseInt(web3.eth.gasPrice.valueOf());
             finalBalance = web3.eth.getBalance(bountyHunterAddress).valueOf();
@@ -121,14 +101,14 @@ contract('BountyContract', function (accounts) {
     });
     it("should revert when bounty reward of 0 has to be credited", function () {
         return BountyContract.deployed().then(function (instance) {
-            return instance.creditTransfer(accounts[1], 0, { from: accounts[1], value: 0 });
+            return instance.untrustedCreditTransfer(accounts[1], 0, { from: accounts[1], value: 0 });
         }).then(assert.fail).catch(function (error) {
             assert.include(error.message, "revert", error.toString());
         })
     });
     it("should revert when bounty reward of 0 has to be withdrawn", function () {
         return BountyContract.deployed().then(function (instance) {
-            return instance.withdrawBountyReward({ from: accounts[1] });
+            return instance.untrustedWithdrawBountyReward({ from: accounts[1] });
         }).then(assert.fail).catch(function (error) {
             assert.include(error.message, "revert", error.toString());
         })

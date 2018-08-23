@@ -59,7 +59,9 @@ All details regarding this can be found here.
 
 ## 3. Interaction
 
-The page should be re-loaded everytime the account is changed in Metamask to ensure that the previous account is not picked for the transaction
+- The page should be re-loaded everytime the account is changed in Metamask to ensure that the previous account is not picked for the transaction
+
+- The state change will reflect once the transaction complete notification is sent by Metamask
 
 ## 4. Implementation
 
@@ -75,7 +77,7 @@ The page should be re-loaded everytime the account is changed in Metamask to ens
 
 - The user can browse the created bounties and corresponding solutions by calling the `getBounty()` and `getSolution()` function
 
-- The Bounty creator can then accept a proposed solution calling the `untrustedAcceptSolution()` [**ONLY BOUNTY CREATOR**] function which marks the Bounty Closed and solution accepted and calls the `untrustedCreditTransfer()` [**ONLY BOUNTY CREATOR**] function 
+- The Bounty creator can then accept a proposed solution calling the `untrustedAcceptSolution()` [**ONLY BOUNTY CREATOR**] function which marks the Bounty Closed and sets the solution accepted and calls the `untrustedCreditTransfer()` [**ONLY BOUNTY CREATOR**] function to transfer the credit to the payee, held in the escrow account
 
 - Once a Bounty Hunter's solution is accepted he can
 
@@ -151,7 +153,7 @@ Actual Result: final credit = initial credit + bounty reward
 #### 4. should withdraw the bounty hunter's winnings from escrow to his address
 
 To Test: Bounty hunter should be able to withdraw/pull his winnings credited to the Escrow account  
-Case: Call `untrustedCheckBountyWinnings()` to check the available credit to be pulled. Check his initial balance. Call `untrustedWithdrawBountyReward()` to wihtdraw the credit and check his final balance  
+Case: Call `untrustedCheckBountyWinnings()` to check the available credit to be pulled. Check his initial balance. Call `untrustedWithdrawBountyReward()` to withdraw the credit and check his final balance  
 Expected Result: final balance = initial balance + available credit - (gas used * gas price)  
 Actual Result: final balance = initial balance + available credit - (gas used * gas price)
 

@@ -8,11 +8,11 @@ import Admin from './Admin'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import {
   hashHistory, Route,
-  BrowserRouter, Switch
+  HashRouter, Switch
 } from 'react-router-dom'
 
 ReactDOM.render(
-  <BrowserRouter history={hashHistory}>
+  <HashRouter history={hashHistory}>
     <Switch>
       <Route exact path="/" component={App} />
       <Route path="/create" component={Create} />
@@ -20,6 +20,6 @@ ReactDOM.render(
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/admin" component={Admin} />
     </Switch>
-  </BrowserRouter>,
+  </HashRouter>,
   document.getElementById('root')
 );

@@ -2,8 +2,8 @@
 
 1. [Race Conditions](#1-race-conditions)
 2. [Integer Overflow and Underflow](#2-integer-overflow-and-underflow)
-3. [Underflow in depth: Storage manipulation](#3-underflow-in-depth)
-4. [DoS with (Unexpected) revert](#4-DoS-with-revert)
+3. [Underflow in depth: Storage manipulation](#3-underflow-in-depth:-storage-manipulation)
+4. [DoS with (Unexpected) revert](#4-DoS-with-(unexpected)-revert)
 5. [DoS with Block gas limit](#5-DoS-with-block-gas-limit)
 
 Avoiding Common Attacks for BountyDApp

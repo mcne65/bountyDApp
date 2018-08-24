@@ -116,11 +116,16 @@ For the steps taken to avoid known common attacks, please see [avoiding common a
 
 ## 9. Rinkeby Test Network, IPFS and ENS
 
- - Any application can take advantage of the Bounty Contract, which is currently deployed on the Rinkeby network at `0x402f40fdf6d210578041f50bdc03be94c33b0af9`. 
+ - Any application can take advantage of the Bounty Contract, which is currently deployed on the Rinkeby network at `0x402f40fdf6d210578041f50bdc03be94c33b0af9`
+
+ - The Admin/Owner address used to deploy the contract to the Rinkeby TestNet is `0x4dE2481FD30c938C5E9cFBCFe6D243f4946bf6BD`
+ The private key for importing this account for testing the features of the App can be provided on request
+
+ - ETH for testing purposes on the Testnet can be requested via this faucet https://www.rinkeby.io/#faucet
  
 - The static assets are deployed to the IPFS hash `QmXmyJdaBYfqeBrJRmKtkxPFiJ8xrUSLaxegvhCT1WqvW9` 
 
- - The ENS name `BountiesNetwork.eth` will also resolve to the BountyContract contract.
+ - The ENS name `BountiesNetwork.eth` will also resolve to the BountyContract contract
 
 All deployed addresses are available in the file [deployed addresses](./deployed_addresses.txt)
 

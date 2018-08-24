@@ -7,12 +7,12 @@ import Dashboard from './Dashboard'
 import Admin from './Admin'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import {
-  browserHistory, Route,
+  hashHistory, Route,
   BrowserRouter, Switch
 } from 'react-router-dom'
 
 ReactDOM.render(
-  <BrowserRouter history={browserHistory}>
+  <BrowserRouter history={hashHistory}>
     <Switch>
       <Route exact path="/" component={App} />
       <Route path="/create" component={Create} />

@@ -116,18 +116,31 @@ For the steps taken to avoid known common attacks, please see [avoiding common a
 
 ## 9. Rinkeby Test Network, IPFS and ENS
 
- - Any application can take advantage of the Bounty Contract, which is currently deployed on the Rinkeby network at `0x402f40fdf6d210578041f50bdc03be94c33b0af9`
+ - Any application can take advantage of the Bounty Contract, which is currently deployed on the Rinkeby network at `0x402f40fdf6d210578041f50bdc03be94c33b0af9`   
+ All deployed addresses are available in the file [deployed addresses](./deployed_addresses.txt)
 
  - An _INFURA_ hosted Ethereum node is used to connect and deploy to the Rinkeby Testnet. The configuration can be seen in the _truffle.config_ file
 
  - The Admin/Owner address used to deploy the contract to the Rinkeby TestNet is `0x4dE2481FD30c938C5E9cFBCFe6D243f4946bf6BD`
  The private key for importing this account for testing the features of the App can be provided on request
-
- - ETH for testing purposes on the Testnet can be requested via this faucet https://www.rinkeby.io/#faucet
  
-- The static assets are deployed to the IPFS hash `QmXmyJdaBYfqeBrJRmKtkxPFiJ8xrUSLaxegvhCT1WqvW9` 
+- The static assets are deployed to the IPFS name hash `QmXmyJdaBYfqeBrJRmKtkxPFiJ8xrUSLaxegvhCT1WqvW9`
+and can be accessed at [https://gateway.ipfs.io/ipns/hashname](https://gateway.ipfs.io/ipns/QmXmyJdaBYfqeBrJRmKtkxPFiJ8xrUSLaxegvhCT1WqvW9/)
 
- - The ENS name `BountiesNetwork.eth` will also resolve to the BountyContract contract
+- Since the IPFS network is smaller and leads to longer load times, the App is also hosted on Github Pages and can be accessed at http://sandhyachandramohan.in/bountyDApp/#
 
-All deployed addresses are available in the file [deployed addresses](./deployed_addresses.txt)
+- The ENS name `bountyDApp.test` resolves to the _BountyContract.sol_ address `0x402f40fdf6d210578041f50bdc03be94c33b0af9` via the `ensutils-rinkeby.js` script pointing to the Rinkeby network contracts:  
+    ```
+    ens contract address: 0xe7410170f87102df0055eb195163a03b7f2bff4a (line 220)
+    publicResolver address: 0x5d20cf83cb385e06d2f2a892f9322cd4933eacdc (line 1314)
+    ```
+    This can be verified by interacting with the public resolver contract at `0x5d20cf83cb385e06d2f2a892f9322cd4933eacdc` on [https://rinkeby.etherscan.io](https://rinkeby.etherscan.io/address/0x5d20cf83cb385e06d2f2a892f9322cd4933eacdc#readContract)
+
+    In the Geth console:
+    ```
+    > namehash("bountyDApp.test")
+    "0x6392e5a64fd88c1daad350ddb726990eabf8ba54f74259a46bd2005e8d5b3c55"
+    ```
+    Calling the `addr()` function with `node(bytes32)` input value as the namehash of "bountyDApp.test" which is `0x6392e5a64fd88c1daad350ddb726990eabf8ba54f74259a46bd2005e8d5b3c55`. The address returned is `0x402f40fdf6d210578041f50bdc03be94c33b0af9` which is the _BountyContract.sol_ address
+
 

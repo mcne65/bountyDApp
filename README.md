@@ -125,7 +125,7 @@ For the steps taken to avoid known common attacks, please see [avoiding common a
  The private key for importing this account for testing the features of the App can be provided on request
  
 - The static assets are deployed to the IPFS name hash `QmXmyJdaBYfqeBrJRmKtkxPFiJ8xrUSLaxegvhCT1WqvW9`
-and can be accessed at [https://gateway.ipfs.io/ipns/hashname](https://gateway.ipfs.io/ipns/QmXmyJdaBYfqeBrJRmKtkxPFiJ8xrUSLaxegvhCT1WqvW9/)
+and can be accessed at [https://gateway.ipfs.io/ipns/QmXmyJdaBYfqeBrJRmKtkxPFiJ8xrUSLaxegvhCT1WqvW9/#/](https://gateway.ipfs.io/ipns/QmXmyJdaBYfqeBrJRmKtkxPFiJ8xrUSLaxegvhCT1WqvW9/#/)
 
 - Since the IPFS network is smaller and leads to longer load times, the App is also hosted on Github Pages and can be accessed at http://sandhyachandramohan.in/bountyDApp/#
 

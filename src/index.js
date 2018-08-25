@@ -14,7 +14,7 @@ import {
 ReactDOM.render(
   <HashRouter history={hashHistory}>
     <Switch>
-      <Route exact path="/" component={App} />
+      <Route exact path="/ipns/QmXmyJdaBYfqeBrJRmKtkxPFiJ8xrUSLaxegvhCT1WqvW9" component={App} />
       <Route path="/create" component={Create} />
       <Route path="/browse" component={Browse} />
       <Route path="/dashboard" component={Dashboard} />

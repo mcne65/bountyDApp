@@ -11,6 +11,7 @@
 7. [Avoiding Common Attacks](#7-avoiding-common-attacks)
 8. [Library/Contracts Imported](#8-library/contracts-imported)
 9. [Rinkeby Test Network, IPFS and ENS](#9-rinkeby-test-network,-ipfs-and-ens)
+10. [Contact](#10-contact)
 
 A Decentralized Application for Bounty Creator and Hunters
 
@@ -61,7 +62,7 @@ All details regarding this can be found here [Rinkeby Test Network, IPFS and ENS
 
 - The page should be re-loaded everytime the account is changed in Metamask to ensure that the previous account is not picked for the transaction
 
-- The state change will reflect once the transaction complete notification is sent by Metamask
+- The state change will reflect once the transaction is complete on the network selected and notification is sent by Metamask. Please wait for transaction completion to notice the state change.
 
 ## 4. Implementation
 
@@ -142,5 +143,10 @@ and can be accessed at [https://gateway.ipfs.io/ipns/QmXmyJdaBYfqeBrJRmKtkxPFiJ8
     "0x6392e5a64fd88c1daad350ddb726990eabf8ba54f74259a46bd2005e8d5b3c55"
     ```
     Calling the `addr()` function with `node(bytes32)` input value as the namehash of "bountyDApp.test" which is `0x6392e5a64fd88c1daad350ddb726990eabf8ba54f74259a46bd2005e8d5b3c55`. The address returned is `0x402f40fdf6d210578041f50bdc03be94c33b0af9` which is the _BountyContract.sol_ address
+    
+## 10. Contact
+
+Contact developer at s4ndhyac@gmail.com for any issues
+
 
 

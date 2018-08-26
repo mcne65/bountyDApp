@@ -95,7 +95,7 @@ To run the tests, run the following command
 
 ``` truffle test ```
 
-The Test cases and their explanations can be found here [tests](./test.md)
+The Test cases and their explanations can be found here [tests](./tests.md)
 
 ## 6. Design Pattern Desicions
 
